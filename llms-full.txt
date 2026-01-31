@@ -1,0 +1,273 @@
+# AI Agent Study Guide - Complete Context
+
+> Learn to build AI coding agents by studying OpenAI Codex-RS architecture.
+
+## Purpose
+
+This repository helps developers understand how to build AI-powered coding assistants by documenting the architecture and implementation patterns of OpenAI's Codex-RS TUI application.
+
+---
+
+## Architecture Overview
+
+### Component Layers
+
+| Layer | Location | Key Structs | Responsibility |
+|-------|----------|-------------|----------------|
+| TUI | codex-rs/tui/ | App, ChatWidget, ChatComposer, ApprovalOverlay | User interface, event handling, rendering |
+| Core | codex-rs/core/ | ThreadManager, CodexThread, Codex | Agent execution, thread lifecycle, LLM interaction |
+| Protocol | codex-rs/protocol/ | Op, EventMsg, Event | Message types, operations, events |
+| App Server | codex-rs/app-server/ | MessageProcessor, CodexMessageProcessor | JSON-RPC for external clients |
+
+### Critical Insight
+
+TUI communicates directly with ThreadManager, NOT through MessageProcessor. The TUI holds `Arc<ThreadManager>` and uses:
+- `submit(Op)` to send operations
+- `recv()` on CodexThread to receive events
+
+MessageProcessor is only for external JSON-RPC clients like VS Code extension.
+
+---
+
+## Communication Flow
+
+### Request Flow (User → Agent)
+```
+User Input → App.handle_key_event() → submit(Op::UserTurn) → CodexThread → Codex → LLM API
+```
+
+### Response Flow (Agent → User)
+```
+LLM Response → Codex → emit Event → CodexThread → recv() → App → ChatWidget → Display
+```
+
+### Approval Flow
+```
+Codex needs approval → emit ExecApprovalRequest → App shows ApprovalOverlay → User decides → submit(Op::ExecApproval) → Codex continues/aborts
+```
+
+---
+
+## Key Types (Protocol Layer)
+
+### Op Enum - Operations submitted to agent
+
+```rust
+pub enum Op {
+    Interrupt,                          // Abort current task
+    UserTurn { items, cwd, model },     // User submits message
+    ExecApproval { id, decision },      // Response to exec approval
+    ApplyPatchApproval { id, decision }, // Response to patch approval
+    Undo,                               // Undo last action
+    RunUserShellCommand { command },    // Run shell command (! prefix)
+    // ... more variants
+}
+```
+
+### EventMsg Enum - Events emitted by agent
+
+```rust
+pub enum EventMsg {
+    Error(ErrorEvent),
+    Warning(WarningEvent),
+    SessionConfigured(SessionConfiguredEvent),
+    TurnStarted(TurnStartedEvent),
+    TurnComplete(TurnCompleteEvent),
+    AgentMessage(AgentMessageEvent),
+    ExecCommandBegin(ExecCommandBeginEvent),
+    ExecCommandEnd(ExecCommandEndEvent),
+    ExecApprovalRequest(ExecApprovalRequestEvent),
+    ApplyPatchApprovalRequest(ApplyPatchApprovalRequestEvent),
+    RequestUserInput(RequestUserInputEvent),
+    // ... more variants
+}
+```
+
+### Event Wrapper
+
+```rust
+pub struct Event {
+    pub id: String,
+    pub msg: EventMsg,
+}
+```
+
+---
+
+## TUI Components
+
+### App Struct (Main Application)
+
+```rust
+pub(crate) struct App {
+    pub(crate) server: Arc<ThreadManager>,  // Direct connection to core
+    pub(crate) otel_manager: OtelManager,
+    pub(crate) app_event_tx: AppEventSender,
+}
+```
+
+Location: `codex-rs/tui/src/app.rs`
+
+### ChatWidget
+
+Handles all chat-related events:
+- `on_exec_approval_request()` - Show approval UI
+- `on_apply_patch_approval_request()` - Show patch approval
+- `on_turn_started()` - Update UI for new turn
+- `on_turn_complete()` - Finalize turn display
+- `on_agent_message()` - Display agent response
+
+Location: `codex-rs/tui/src/chatwidget.rs`
+
+### ApprovalOverlay
+
+Queue-based approval system:
+
+```rust
+pub(crate) struct ApprovalOverlay {
+    current_request: Option<ApprovalRequest>,
+    current_variant: Option<ApprovalVariant>,
+    queue: Vec<ApprovalRequest>,
+    app_event_tx: AppEventSender,
+    list: ListSelectionView,
+}
+```
+
+Location: `codex-rs/tui/src/bottom_pane/approval_overlay.rs`
+
+---
+
+## Core Components
+
+### ThreadManager
+
+Manages CodexThread lifecycle. TUI calls:
+- `start_thread(config)` - Create new agent thread
+- Returns `Arc<CodexThread>` for direct communication
+
+Location: `codex-rs/core/src/thread_manager.rs`
+
+### CodexThread
+
+Wraps Codex agent with channel-based communication:
+- `submit(Op)` - Send operation to agent
+- `recv()` - Receive next event from agent
+
+Location: `codex-rs/core/src/codex_thread.rs`
+
+### Codex
+
+The actual agent implementation:
+- Manages LLM API calls
+- Executes tools
+- Manages sessions
+- Emits events
+
+Location: `codex-rs/core/src/codex.rs`
+
+---
+
+## State Machine
+
+```
+[*] → Idle → Initializing → Ready → ProcessingTurn → WaitingApproval → ProcessingTurn → Ready → [*]
+                                  ↓                                   ↓
+                              Resuming ───────────────────────────→ Ready
+```
+
+States:
+- **Idle**: App created, no thread
+- **Initializing**: Thread starting
+- **Ready**: Waiting for user input
+- **ProcessingTurn**: Agent working
+- **WaitingApproval**: Approval required
+- **Resuming**: Restoring previous session
+
+---
+
+## External Client Flow (App Server)
+
+For VS Code extension and other clients:
+
+```
+VS Code → JSON-RPC → MessageProcessor → CodexMessageProcessor → ThreadManager → CodexThread
+       ← Notifications ← Event stream ←
+```
+
+This is separate from TUI flow. TUI does NOT use MessageProcessor.
+
+---
+
+## File Reference
+
+| Component | File Path |
+|-----------|-----------|
+| App struct | codex-rs/tui/src/app.rs |
+| ChatWidget | codex-rs/tui/src/chatwidget.rs |
+| ChatComposer | codex-rs/tui/src/bottom_pane/chat_composer.rs |
+| ApprovalOverlay | codex-rs/tui/src/bottom_pane/approval_overlay.rs |
+| AppEvent | codex-rs/tui/src/app_event.rs |
+| ThreadManager | codex-rs/core/src/thread_manager.rs |
+| CodexThread | codex-rs/core/src/codex_thread.rs |
+| Codex | codex-rs/core/src/codex.rs |
+| Op enum | codex-rs/protocol/src/protocol.rs |
+| EventMsg enum | codex-rs/protocol/src/protocol.rs |
+| MessageProcessor | codex-rs/app-server/src/message_processor.rs |
+| CodexMessageProcessor | codex-rs/app-server/src/codex_message_processor.rs |
+
+---
+
+## Source Repository
+
+All documentation references: https://github.com/openai/codex
+
+Key directories:
+- https://github.com/openai/codex/tree/main/codex-rs/tui
+- https://github.com/openai/codex/tree/main/codex-rs/core
+- https://github.com/openai/codex/tree/main/codex-rs/protocol
+- https://github.com/openai/codex/tree/main/codex-rs/app-server
+
+---
+
+## AI Agent Workflows
+
+See docs/WORKFLOWS.md for detailed step-by-step workflows:
+
+1. **Add New Architecture Diagram**: Research → Create Mermaid → Validate → Update indexes
+2. **Update Existing Documentation**: Read → Check dependencies → Edit → Update indexes
+3. **Add New Concept**: Choose file → Follow conventions → Add source refs → Update indexes
+4. **Verify Repository Integrity**: Check diagrams → Verify structure → Validate links
+5. **Research Codex-RS Source**: Clone → Locate → Extract types → Document
+
+---
+
+## AI Tool Configurations
+
+This repository is optimized for multiple AI coding tools:
+
+| Tool | Config File | Purpose |
+|------|-------------|---------|
+| Claude Code | CLAUDE.md, .claude/settings.json | Claude-specific instructions |
+| Cursor | .cursorrules, .cursor/rules/*.mdc | Cursor AI rules |
+| Windsurf | .windsurfrules | Windsurf AI instructions |
+| Aider | .aider.conf.yml | Aider configuration |
+| Continue.dev | .continue/config.json | Continue extension |
+| GitHub Copilot | .github/copilot-instructions.md | Copilot context |
+| MCP Servers | .mcp.json | Model Context Protocol |
+| Gitingest | .gitingest | Repo-to-text conversion |
+
+---
+
+## Task Restrictions
+
+### Allowed
+- Edit markdown files in docs/
+- Update llms.txt and llms-full.txt
+- Add Mermaid diagrams
+- Write Rust code snippets (documentation only)
+
+### Forbidden
+- Creating source code files
+- Adding package dependencies
+- Modifying codex-architecture.html directly
+- Running build commands

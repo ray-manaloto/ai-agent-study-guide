@@ -1,0 +1,41 @@
+{
+  "name": "AI Agent Study Guide",
+  "description": "Documentation repository for studying OpenAI Codex-RS architecture",
+  "contextProviders": [
+    {
+      "name": "file",
+      "params": {
+        "files": [
+          "AGENTS.md",
+          "llms-full.txt",
+          "docs/architecture-diagram.md"
+        ]
+      }
+    }
+  ],
+  "customCommands": [
+    {
+      "name": "verify-mermaid",
+      "description": "Verify Mermaid diagrams render correctly",
+      "command": "mmdc -i docs/architecture-diagram.md -o /tmp/test.png && echo 'Mermaid OK'"
+    },
+    {
+      "name": "update-index",
+      "description": "Reminder to update llms.txt after doc changes",
+      "command": "echo 'Remember to update llms.txt and llms-full.txt with new content'"
+    }
+  ],
+  "docs": [
+    {
+      "name": "Codex-RS",
+      "url": "https://github.com/openai/codex/tree/main/codex-rs"
+    }
+  ],
+  "rules": [
+    "This is a documentation-only repository",
+    "Use Mermaid for all architecture diagrams",
+    "Include GitHub source links in all documentation",
+    "Keep docs concise and LLM-optimized",
+    "TUI communicates directly with ThreadManager, NOT MessageProcessor"
+  ]
+}

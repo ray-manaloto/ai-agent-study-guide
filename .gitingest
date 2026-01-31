@@ -1,0 +1,28 @@
+# Gitingest Configuration
+# Makes this repo optimized for gitingest conversion to LLM-friendly text
+
+# Include patterns - files to include in digest
+include:
+  - "*.md"
+  - "*.txt"
+  - "*.html"
+  - "*.json"
+  - "*.sh"
+  - "*.mdc"
+  - ".cursorrules"
+
+# Exclude patterns
+exclude:
+  - "node_modules/**"
+  - ".git/**"
+  - "*.png"
+  - "*.svg"
+  - "*.jpg"
+  - "*.jpeg"
+  - ".DS_Store"
+
+# Output configuration
+output:
+  format: markdown
+  include_tree: true
+  include_summary: true

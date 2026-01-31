@@ -1,0 +1,26 @@
+{
+  "project": {
+    "name": "AI Agent Study Guide",
+    "type": "documentation",
+    "description": "Documentation repository for studying OpenAI Codex-RS architecture"
+  },
+  "context": {
+    "primaryFiles": [
+      "docs/architecture-diagram.md",
+      "docs/codex-architecture.html",
+      "llms-full.txt"
+    ],
+    "llmOptimized": true
+  },
+  "preferences": {
+    "codeStyle": "rust",
+    "diagramFormat": "mermaid",
+    "documentationStyle": "concise"
+  },
+  "externalReferences": {
+    "codexRepo": "https://github.com/openai/codex",
+    "tuiSource": "https://github.com/openai/codex/tree/main/codex-rs/tui",
+    "coreSource": "https://github.com/openai/codex/tree/main/codex-rs/core",
+    "protocolSource": "https://github.com/openai/codex/tree/main/codex-rs/protocol"
+  }
+}

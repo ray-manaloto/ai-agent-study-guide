@@ -1,0 +1,34 @@
+---
+description: Architecture knowledge for Codex-RS analysis
+globs: ["**/*"]
+alwaysApply: true
+---
+
+# Codex-RS Architecture Context
+
+## Layer Communication
+
+```
+TUI Layer (App) → Core Layer (ThreadManager → CodexThread → Codex)
+               ← Events via async channel
+```
+
+## Critical Facts
+
+1. TUI uses ThreadManager DIRECTLY
+2. MessageProcessor is ONLY for external JSON-RPC (VS Code)
+3. Communication: submit(Op) → recv() Event
+4. ApprovalOverlay maintains a QUEUE of requests
+
+## Key File Mappings
+
+| Component | File |
+|-----------|------|
+| App | codex-rs/tui/src/app.rs |
+| ThreadManager | codex-rs/core/src/thread_manager.rs |
+| CodexThread | codex-rs/core/src/codex_thread.rs |
+| Op, EventMsg | codex-rs/protocol/src/protocol.rs |
+
+## External Reference
+
+Source: https://github.com/openai/codex

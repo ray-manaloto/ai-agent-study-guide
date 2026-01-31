@@ -1,0 +1,36 @@
+# Aider Configuration
+
+# Repository context
+read:
+  - AGENTS.md
+  - llms-full.txt
+  - docs/architecture-diagram.md
+
+# Files to watch
+watch-files:
+  - "docs/*.md"
+  - "*.txt"
+  - "*.md"
+
+# Auto-commit settings
+auto-commits: false
+dirty-commits: false
+
+# Model preferences
+# Use models good at technical documentation
+model: claude-3-5-sonnet-20241022
+
+# Linting
+lint: false
+auto-lint: false
+
+# Testing (none for docs repo)
+test: false
+auto-test: false
+
+# Git settings
+gitignore: true
+aiderignore: true
+
+# Documentation repo - no code execution
+no-auto-commits: true

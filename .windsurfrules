@@ -1,0 +1,29 @@
+# Windsurf AI Rules
+
+## Project Type
+Documentation-only repository. No implementation code.
+
+## Subject Matter
+OpenAI Codex-RS TUI architecture for AI coding agents.
+
+## Allowed Operations
+- Edit markdown files in docs/
+- Update llms.txt and llms-full.txt
+- Add Mermaid diagrams
+- Write Rust code snippets (documentation only)
+
+## Forbidden Operations
+- Creating source code files
+- Adding package dependencies
+- Modifying codex-architecture.html
+- Running build commands
+
+## Documentation Standards
+- Concise, no filler words
+- Use tables for mappings
+- Include GitHub source links
+- Validate Mermaid syntax
+
+## Key Insight
+TUI → ThreadManager (direct channel)
+NOT: TUI → MessageProcessor → ThreadManager

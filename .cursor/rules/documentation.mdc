@@ -1,0 +1,30 @@
+---
+description: Documentation standards for AI Agent Study Guide
+globs: ["docs/**/*.md", "*.md"]
+---
+
+# Documentation Rules
+
+## Mermaid Diagrams
+- Always use ```mermaid code blocks
+- Include participant labels with file locations
+- Use colored rectangles to group related flows
+- Validate diagrams render correctly
+
+## Writing Style
+- Be concise - no filler words
+- Use tables for component mappings
+- Include Rust code snippets for types
+- Link to GitHub source files
+
+## Structure
+- Start with overview/summary
+- Use hierarchical headings (H2 for sections, H3 for subsections)
+- End with file location tables
+- Include "Key Insights" section
+
+## LLM Optimization
+- Define all acronyms on first use
+- State defaults explicitly
+- Avoid ambiguous pronouns
+- Use complete sentences for context
