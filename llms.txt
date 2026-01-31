@@ -25,7 +25,9 @@
 
 | Tool | Purpose |
 |------|---------|
-| [npx skills](https://github.com/vercel-labs/skills) | CLI to install/manage Agent Skills |
+| [npx agent-browser](https://github.com/vercel-labs/agent-browser) | Browser automation CLI for AI agents (11.8k ⭐) |
+| [npx skills](https://github.com/vercel-labs/skills) | CLI to install/manage Agent Skills (3.7k ⭐) |
+| [npx opensrc](https://github.com/vercel-labs/opensrc) | Fetch library source for AI context (328 ⭐) |
 | [agentskills.io](https://agentskills.io) | SKILL.md specification |
 | [skills.sh](https://skills.sh) | Skill discovery directory |
 
