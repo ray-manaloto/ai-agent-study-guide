@@ -16,6 +16,7 @@ This directory contains all documentation for the Codex-RS architecture study.
 | `GLOSSARY.md` | Term definitions |
 | `PATTERNS.md` | Reusable implementation patterns |
 | `WORKFLOWS.md` | Step-by-step task workflows |
+| `TOOLS-RESEARCH.md` | Vercel Labs AI tools research (use existing tools!) |
 
 ## Editing Rules
 

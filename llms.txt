@@ -14,6 +14,7 @@
 - [docs/GLOSSARY.md](docs/GLOSSARY.md): Term definitions
 - [docs/PATTERNS.md](docs/PATTERNS.md): Implementation patterns
 - [docs/WORKFLOWS.md](docs/WORKFLOWS.md): Step-by-step task workflows
+- [docs/TOOLS-RESEARCH.md](docs/TOOLS-RESEARCH.md): Vercel Labs AI tools research
 
 ## Templates & Tools
 

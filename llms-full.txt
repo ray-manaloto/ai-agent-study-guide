@@ -272,6 +272,21 @@ See docs/WORKFLOWS.md for detailed step-by-step workflows:
 
 ---
 
+## Vercel Labs AI Tools Research
+
+See [docs/TOOLS-RESEARCH.md](docs/TOOLS-RESEARCH.md) for comprehensive analysis.
+
+**Key Finding**: Use existing tools, don't build your own.
+
+| Tool | Purpose | Stars |
+|------|---------|-------|
+| `npx skills` | CLI for skill management | 3.7k |
+| `npx opensrc` | Fetch npm source for AI context | 328 |
+| `skills-handler` | Serve skills via HTTP | 2 |
+| `specli` | OpenAPI → Agent CLI | 92 |
+
+**Recommendation**: Use `npx skills add` for automation instead of manual setup.
+
 ## AI Tool Configurations
 
 This repository is optimized for multiple AI coding tools:
