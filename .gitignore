@@ -21,3 +21,20 @@ build/
 .env.local
 *.key
 *.pem
+
+# Installed Skills (via npx skills add)
+# These are installed artifacts, not source code
+# Source skills are in docs/templates/
+.agents/skills/
+.claude/skills/
+.cursor/skills/
+.codex/skills/
+.continue/skills/
+.windsurf/skills/
+.cline/skills/
+.goose/skills/
+.roo/skills/
+.github/skills/
+
+# opensrc (npm source for AI context)
+opensrc/
