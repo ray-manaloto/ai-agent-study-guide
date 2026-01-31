@@ -1,30 +1,456 @@
-# Cursor AI Rules
+# Cursor AI Rules - AI Agent Study Guide
+
+> Documentation repository studying OpenAI Codex-RS TUI architecture for building AI coding agents.
+
+---
+
+## Project Overview
+
+This is a **documentation-only** repository. No implementation code should be created.
+
+| Attribute | Value |
+|-----------|-------|
+| Purpose | Study OpenAI Codex-RS TUI architecture |
+| Type | Documentation repository |
+| Source | https://github.com/openai/codex |
+| Primary Output | Mermaid diagrams, markdown documentation |
+
+### Goals
+
+1. Document the communication flow between Codex-RS components
+2. Extract reusable patterns for AI coding agents
+3. Provide clear architecture diagrams with source references
+4. Create templates for LLM-optimizing other projects
+
+---
 
 ## Entry Points
-- AGENTS.md - AI instructions
-- llms.txt - Doc index
-- docs/AGENTS.md - Subdirectory context
-- docs/WORKFLOWS.md - Task steps
 
-## Project Type
-Documentation-only. No implementation code.
+Read files in this priority order:
 
-## Key Files
-- docs/architecture-diagram.md - Mermaid diagrams
-- docs/WORKFLOWS.md - Step-by-step tasks
-- llms-full.txt - Complete context
+| Priority | File | Purpose |
+|----------|------|---------|
+| 1 | `AGENTS.md` | AI agent instructions and coordination |
+| 2 | `llms.txt` | Documentation index for LLM consumption |
+| 3 | `llms-full.txt` | Complete context dump |
+| 4 | `docs/WORKFLOWS.md` | Task execution steps |
+| 5 | `docs/architecture-diagram.md` | Primary technical reference |
 
-## Style
-- Concise, no filler
-- Tables for mappings
-- Include GitHub source links
-- Mermaid for diagrams
+### Subdirectory Context
 
-## Architecture Fact
-TUI → ThreadManager (direct)
-NOT: TUI → MessageProcessor → ThreadManager
+When working in `docs/`, also read `docs/AGENTS.md` for local context.
 
-## Do Not
-- Create implementation code
-- Add dependencies
-- Modify HTML directly
+---
+
+## Technology Context
+
+| Technology | Usage |
+|------------|-------|
+| Markdown | All documentation |
+| Mermaid | Architecture diagrams |
+| glow | Terminal markdown preview |
+| mermaid-cli | Diagram validation |
+| HTML | Generated output (do not edit) |
+
+### No Build System
+
+This repository has no:
+- Package managers (npm, cargo, etc.)
+- Build tools
+- Dependencies to install
+- Tests to run (except Mermaid validation)
+
+---
+
+## File Organization
+
+```
+ai-agent-study-guide/
+├── AGENTS.md              # AI agent instructions (root)
+├── CLAUDE.md              # Claude Code configuration
+├── .cursorrules           # Cursor AI rules (this file)
+├── llms.txt               # Documentation index
+├── llms-full.txt          # Complete context
+├── README.md              # Project overview
+├── docs/
+│   ├── AGENTS.md          # Subdirectory agent context
+│   ├── architecture-diagram.md  # Mermaid diagrams (PRIMARY)
+│   ├── codex-architecture.html  # Generated HTML (DO NOT EDIT)
+│   ├── CONCEPTS.md        # Core concepts
+│   ├── GLOSSARY.md        # Term definitions
+│   ├── PATTERNS.md        # Implementation patterns
+│   ├── WORKFLOWS.md       # Task workflows
+│   ├── TOOLS-RESEARCH.md  # AI tools research
+│   └── templates/
+│       ├── LLM-OPTIMIZATION-TEMPLATE.md
+│       └── llm-project-optimization/
+│           └── SKILL.md
+└── scripts/
+    └── render-diagrams.sh # Mermaid validation
+```
+
+---
+
+## Naming Conventions
+
+### Documentation Files
+
+| Pattern | Example | Usage |
+|---------|---------|-------|
+| SCREAMING_SNAKE.md | `CONCEPTS.md` | Core documentation |
+| kebab-case.md | `architecture-diagram.md` | Technical diagrams |
+| AGENTS.md | `docs/AGENTS.md` | Subdirectory context |
+
+### Content Naming
+
+| Element | Convention | Example |
+|---------|------------|---------|
+| Sections | Title Case | `## Key Insights` |
+| Code references | backticks | `codex-rs/tui/src/app.rs` |
+| Component names | PascalCase | `ThreadManager`, `CodexThread` |
+| Enum variants | PascalCase | `UserTurn`, `TurnComplete` |
+
+---
+
+## Documentation Patterns
+
+### Tables for Mappings
+
+Always use tables for:
+- File locations
+- Component responsibilities
+- Type definitions
+- Command references
+
+```markdown
+| Component | Location | Purpose |
+|-----------|----------|---------|
+| App | `codex-rs/tui/src/app.rs` | Main TUI struct |
+```
+
+### Code Blocks with Context
+
+Include file paths in code blocks:
+
+```markdown
+```rust
+// codex-rs/protocol/src/protocol.rs
+pub enum Op {
+    UserTurn { items: Vec<UserInput> },
+    // ...
+}
+```
+```
+
+### Mermaid Diagrams
+
+Include participant labels with file paths:
+
+```markdown
+```mermaid
+sequenceDiagram
+    participant App as App<br/>(tui/app.rs)
+    participant TM as ThreadManager<br/>(core/thread_manager.rs)
+```
+```
+
+### Source Links
+
+Always include GitHub source links:
+
+```markdown
+**Source**: [codex-rs/tui/src/app.rs](https://github.com/openai/codex/blob/main/codex-rs/tui/src/app.rs)
+```
+
+---
+
+## Common Tasks
+
+### Task 1: Add New Diagram
+
+1. Open `docs/architecture-diagram.md`
+2. Add new section with Mermaid diagram
+3. Include participant labels with file paths
+4. Validate: `./scripts/render-diagrams.sh`
+5. Update `llms.txt` with new content reference
+
+### Task 2: Update Documentation
+
+1. Read current content
+2. Check cross-references in `llms.txt`
+3. Make changes maintaining style consistency
+4. Update `llms.txt` and `llms-full.txt`
+5. Verify with `glow docs/[file].md`
+
+### Task 3: Add New Concept
+
+1. Determine target file:
+   - Pattern → `docs/PATTERNS.md`
+   - Term → `docs/GLOSSARY.md`
+   - Concept → `docs/CONCEPTS.md`
+2. Follow existing format in target file
+3. Include source file reference
+4. Update indexes
+
+### Task 4: Verify Repository
+
+```bash
+./scripts/render-diagrams.sh        # Validate Mermaid
+glow docs/architecture-diagram.md   # Preview content
+open docs/codex-architecture.html   # View rendered diagrams
+```
+
+---
+
+## Forbidden Actions
+
+| Action | Reason |
+|--------|--------|
+| Create implementation code | Documentation-only repository |
+| Modify HTML directly | Regenerate from Mermaid source |
+| Add dependencies | No package management |
+| Create test files | No testing framework |
+| Add build configuration | No build system |
+
+---
+
+## Critical Architecture Facts
+
+### TUI Communication Path
+
+```
+CORRECT:  TUI App → ThreadManager → CodexThread → Codex
+WRONG:    TUI App → MessageProcessor → ThreadManager
+```
+
+**MessageProcessor is ONLY for external JSON-RPC clients (VS Code extension).**
+
+### Key Types
+
+| Type | Direction | Purpose |
+|------|-----------|---------|
+| `Op` enum | Input to agent | User operations (UserTurn, ExecApproval, Interrupt) |
+| `EventMsg` enum | Output from agent | Agent events (TurnStarted, TurnComplete, AgentMessage) |
+| `Event` struct | Wrapper | Contains id + EventMsg |
+
+### Component Layers
+
+```
+┌─────────────────────────────┐
+│  TUI Layer (presentation)   │  codex-rs/tui/
+├─────────────────────────────┤
+│  Core Layer (business)      │  codex-rs/core/
+├─────────────────────────────┤
+│  Protocol Layer (contract)  │  codex-rs/protocol/
+├─────────────────────────────┤
+│  App Server (external)      │  codex-rs/app-server/
+└─────────────────────────────┘
+```
+
+---
+
+## Anti-Patterns to Avoid
+
+### Documentation Anti-Patterns
+
+| Anti-Pattern | Correct Approach |
+|--------------|------------------|
+| Verbose explanations | Concise, use tables |
+| Missing source links | Always include GitHub links |
+| Outdated Codex-RS info | Verify against current source |
+| Unvalidated Mermaid | Run render-diagrams.sh |
+| Orphaned content | Update llms.txt after changes |
+
+### Code Example Anti-Patterns
+
+| Anti-Pattern | Correct Approach |
+|--------------|------------------|
+| Implementation code | Only documentation and examples |
+| Code without file path | Include source file in comment |
+| Untested examples | Verify against actual Codex-RS source |
+
+---
+
+## Quality Checklist
+
+Before completing any documentation task:
+
+- [ ] Mermaid diagrams render without errors
+- [ ] Source file paths included in code blocks
+- [ ] GitHub links are valid
+- [ ] llms.txt updated
+- [ ] llms-full.txt updated (if significant changes)
+- [ ] Consistent with existing documentation style
+- [ ] Tables used for mappings
+- [ ] No implementation code created
+
+---
+
+## Key Codex-RS Components
+
+### TUI Layer (`codex-rs/tui/`)
+
+| Component | File | Purpose |
+|-----------|------|---------|
+| App | `app.rs` | Main application struct, event loop |
+| ChatWidget | `chatwidget.rs` | Message display |
+| ChatComposer | `bottom_pane/chat_composer.rs` | Input handling |
+| ApprovalOverlay | `bottom_pane/approval_overlay.rs` | Approval UI |
+| AppEvent | `app_event.rs` | Internal event types |
+
+### Core Layer (`codex-rs/core/`)
+
+| Component | File | Purpose |
+|-----------|------|---------|
+| ThreadManager | `thread_manager.rs` | Thread lifecycle |
+| CodexThread | `codex_thread.rs` | Agent wrapper |
+| Codex | `codex.rs` | Agent implementation |
+| Session | `session.rs` | Session state |
+
+### Protocol Layer (`codex-rs/protocol/`)
+
+| Type | Purpose |
+|------|---------|
+| Op | Operations submitted to agent |
+| EventMsg | Events emitted by agent |
+| Event | Wrapper with id + msg |
+
+### App Server (`codex-rs/app-server/`)
+
+| Component | Purpose |
+|-----------|---------|
+| MessageProcessor | JSON-RPC handling |
+| CodexMessageProcessor | Codex-specific handlers |
+
+---
+
+## Cross-Reference Guidelines
+
+### When to Update llms.txt
+
+- Adding new documentation file
+- Adding new section to existing file
+- Changing file names or locations
+- Adding new concepts or patterns
+
+### When to Update llms-full.txt
+
+- Major content additions
+- New architecture diagrams
+- Significant pattern documentation
+- Comprehensive changes
+
+### Cross-Reference Format
+
+```markdown
+See also: [PATTERNS.md](docs/PATTERNS.md#pattern-1-typed-message-protocol)
+```
+
+---
+
+## Templates
+
+### New Documentation Section
+
+```markdown
+## Section Title
+
+> Brief description
+
+### Subsection
+
+| Column 1 | Column 2 |
+|----------|----------|
+| Value | Description |
+
+**Source**: [file.rs](https://github.com/openai/codex/blob/main/path/file.rs)
+```
+
+### New Mermaid Diagram
+
+```markdown
+## Diagram Title
+
+```mermaid
+sequenceDiagram
+    participant A as Component<br/>(path/file.rs)
+    participant B as Component<br/>(path/file.rs)
+    A->>B: message
+    B-->>A: response
+```
+```
+
+### New Pattern Entry
+
+```markdown
+## Pattern N: Pattern Name
+
+### Problem
+Description of the problem being solved.
+
+### Solution
+```rust
+// codex-rs/path/to/file.rs
+// Code example
+```
+
+### Benefits
+- Benefit 1
+- Benefit 2
+```
+
+---
+
+## Verification Commands
+
+```bash
+# Validate Mermaid diagrams
+./scripts/render-diagrams.sh
+
+# Preview markdown in terminal
+glow docs/architecture-diagram.md
+glow docs/CONCEPTS.md
+
+# View rendered HTML diagrams
+open docs/codex-architecture.html
+
+# Check file structure
+ls -la docs/
+
+# Search for content
+grep -r "ThreadManager" docs/
+```
+
+---
+
+## Style Guidelines
+
+### Tone
+
+- Technical and precise
+- Concise (no filler words)
+- Factual (cite sources)
+
+### Formatting
+
+- Use tables for structured data
+- Use code blocks for all code
+- Use blockquotes for important notes
+- Use horizontal rules to separate major sections
+
+### Length
+
+- Prefer shorter, focused sections
+- Break long content into subsections
+- Use lists for 3+ items
+
+---
+
+## Resources
+
+| Resource | URL |
+|----------|-----|
+| Codex-RS Source | https://github.com/openai/codex |
+| Mermaid Documentation | https://mermaid.js.org/ |
+| llms.txt Standard | https://llmstxt.org/ |
+| glow CLI | https://github.com/charmbracelet/glow |
