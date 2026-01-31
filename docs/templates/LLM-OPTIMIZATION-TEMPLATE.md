@@ -17,10 +17,16 @@ project/
 ├── README.md         # Human entry point (includes "For AI: see AGENTS.md")
 ├── llms.txt          # Documentation index
 ├── llms-full.txt     # Complete context
+├── .agents/          # Canonical location for skills (npx skills uses this)
+│   └── skills/       # Symlinked to .claude/, .cursor/, etc.
+│       └── my-skill/
+│           └── SKILL.md
 └── docs/
     ├── AGENTS.md     # Subdirectory context
     └── WORKFLOWS.md  # Task execution steps
 ```
+
+> **Note**: `.agents/skills/` is the canonical location used by `npx skills`. Other directories like `.claude/skills/`, `.cursor/skills/` are symlinked to it automatically.
 
 ---
 

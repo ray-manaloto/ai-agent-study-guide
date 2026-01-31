@@ -54,6 +54,57 @@ npx skills update                            # Update all skills
 - CI/CD friendly with `--yes` flag
 - Active development (v1.3.1 released Jan 2026)
 
+#### Canonical `.agents/skills/` Directory
+
+**KEY FINDING**: The `npx skills` CLI uses `.agents/skills/` as the **canonical location** for all skills.
+
+**How it works**:
+```
+.agents/skills/              ← CANONICAL (single source of truth)
+├── my-skill/
+│   └── SKILL.md
+└── another-skill/
+    └── SKILL.md
+
+.claude/skills/my-skill      → symlink to .agents/skills/my-skill
+.cursor/skills/my-skill      → symlink to .agents/skills/my-skill
+.codex/skills/my-skill       → symlink to .agents/skills/my-skill
+```
+
+**From `src/installer.ts`**:
+```typescript
+const AGENTS_DIR = '.agents';
+const SKILLS_SUBDIR = 'skills';
+
+// Canonical location: .agents/skills/<skill-name>
+const canonicalDir = join(canonicalBase, skillName);
+
+// Agent-specific location (for symlink)
+```
+
+**Installation modes**:
+| Mode | Description |
+|------|-------------|
+| **Symlink** (Recommended) | Single source of truth in `.agents/skills/`, symlinks for each agent |
+| **Copy** | Independent copies in each agent's directory |
+
+**Agents using `.agents/skills/` directly**:
+| Agent | Path |
+|-------|------|
+| Amp | `.agents/skills/` |
+| Kimi Code CLI | `.agents/skills/` |
+
+**Search paths** (the CLI looks in all of these):
+- `.agents/skills/`
+- `.agent/skills/`
+- `skills/`
+- `.claude/skills/`
+- `.cursor/skills/`
+- `.codex/skills/`
+- (and 20+ more)
+
+**Implication**: You don't need multiple directories. Just use `.agents/skills/` and let `npx skills` handle symlinking to agent-specific paths.
+
 ---
 
 ### 2. vercel-labs/agent-skills (Reference)
@@ -279,6 +330,84 @@ skill-name/
 │  └──────────────┘     └──────────────┘     └──────────────┘    │
 │                                                                  │
 └─────────────────────────────────────────────────────────────────┘
+```
+
+---
+
+## `.agents/` Canonical Directory (Reduces Duplication)
+
+The `npx skills` CLI uses `.agents/skills/` as the **single source of truth**, with symlinks to agent-specific directories.
+
+### Directory Structure After Installation
+
+```
+project/
+├── .agents/                      # CANONICAL (source of truth)
+│   └── skills/
+│       ├── my-skill/
+│       │   └── SKILL.md
+│       └── another-skill/
+│           └── SKILL.md
+│
+├── .claude/skills/               # Symlinks for Claude Code
+│   ├── my-skill → ../../.agents/skills/my-skill
+│   └── another-skill → ../../.agents/skills/another-skill
+│
+├── .cursor/skills/               # Symlinks for Cursor
+│   ├── my-skill → ../../.agents/skills/my-skill
+│   └── another-skill → ../../.agents/skills/another-skill
+│
+├── .codex/skills/                # Symlinks for Codex
+│   └── ...
+│
+└── (other agent dirs)            # All symlink to .agents/
+```
+
+### Benefits of This Approach
+
+| Benefit | Description |
+|---------|-------------|
+| **Single source of truth** | Update skill once, all agents see it |
+| **No duplication** | Symlinks instead of copies |
+| **Easy updates** | `npx skills update` updates canonical, symlinks follow |
+| **Disk efficient** | One copy per skill, not N copies per agent |
+| **Git friendly** | Only `.agents/skills/` needs to be tracked |
+
+### Agents That Use `.agents/` Directly
+
+Some agents already use `.agents/skills/` as their primary path (no symlink needed):
+
+| Agent | Primary Path |
+|-------|--------------|
+| Amp | `.agents/skills/` |
+| Kimi Code CLI | `.agents/skills/` |
+
+### Installation Command
+
+```bash
+# Symlink mode (default, recommended)
+npx skills add owner/repo
+
+# Copy mode (if symlinks not supported)
+npx skills add owner/repo --copy
+
+# Interactive selection
+npx skills add owner/repo
+# → Choose: Symlink (Recommended) or Copy
+```
+
+### Implications for Project Authors
+
+1. **Don't create multiple directories** - Just use `.agents/skills/` or let `npx skills` handle it
+2. **Git ignore agent-specific dirs** - They're just symlinks
+3. **Track `.agents/`** - This is the canonical location
+
+```gitignore
+# .gitignore
+.claude/skills/     # Symlinks only
+.cursor/skills/     # Symlinks only
+.codex/skills/      # Symlinks only
+# Keep .agents/skills/ tracked (or ignore if installed dynamically)
 ```
 
 ---
