@@ -229,6 +229,12 @@ Key directories:
 
 ---
 
+## Template for Other Projects
+
+See docs/templates/LLM-OPTIMIZATION-TEMPLATE.md for a reusable template to LLM-optimize any project.
+
+---
+
 ## AI Agent Workflows
 
 See docs/WORKFLOWS.md for detailed step-by-step workflows:

@@ -1,65 +1,31 @@
 # AI Agent Study Guide
 
-> Learn to build AI coding agents by studying OpenAI Codex-RS architecture. This repository documents the TUI ↔ Agent communication patterns, event-driven architecture, and approval workflows used in production AI coding assistants.
+> Documentation repository studying OpenAI Codex-RS TUI architecture for AI coding agents.
 
-## Quick Start for AI Agents
+## Entry Points
 
-- [LLM-OPTIMIZATION-TEMPLATE.md](LLM-OPTIMIZATION-TEMPLATE.md): **Minimal template to LLM-optimize any project** - copy and adapt
+- [AGENTS.md](AGENTS.md): AI agent instructions
+- [llms-full.txt](llms-full.txt): Complete context (use this for full understanding)
 
 ## Documentation
 
-- [Architecture Diagram](docs/architecture-diagram.md): Mermaid sequence diagrams showing TUI ↔ Core Agent communication flow, approval workflows, and state machine
-- [Interactive Architecture](docs/codex-architecture.html): HTML page with expandable nodes, GitHub source links, and 5 rendered mermaid diagrams
-- [Core Concepts](docs/CONCEPTS.md): Agent communication patterns, safety patterns, thread management, event-driven architecture
-- [Glossary](docs/GLOSSARY.md): Definitions of key terms used in AI agent architecture
-- [Implementation Patterns](docs/PATTERNS.md): Reusable patterns for building AI coding agents
-- [AI Agent Workflows](docs/WORKFLOWS.md): Step-by-step workflows for AI agents working on this repository
+- [docs/architecture-diagram.md](docs/architecture-diagram.md): Mermaid sequence diagrams
+- [docs/CONCEPTS.md](docs/CONCEPTS.md): Core concepts
+- [docs/GLOSSARY.md](docs/GLOSSARY.md): Term definitions
+- [docs/PATTERNS.md](docs/PATTERNS.md): Implementation patterns
+- [docs/WORKFLOWS.md](docs/WORKFLOWS.md): Step-by-step task workflows
 
-## AI Tool Configurations
+## Template
 
-This repository includes configurations for multiple AI coding tools:
-- Claude Code: CLAUDE.md, .claude/settings.json
-- Cursor: .cursorrules, .cursor/rules/*.mdc
-- Windsurf: .windsurfrules
-- Aider: .aider.conf.yml
-- Continue.dev: .continue/config.json
-- GitHub Copilot: .github/copilot-instructions.md
-- MCP Servers: .mcp.json
-- Gitingest: .gitingest
+- [docs/templates/LLM-OPTIMIZATION-TEMPLATE.md](docs/templates/LLM-OPTIMIZATION-TEMPLATE.md): Reusable template to LLM-optimize any project
 
-## Key Concepts
+## Key Facts
 
-### Architecture Layers
-- TUI Layer: User interface, event handling, rendering (App, ChatWidget, ApprovalOverlay)
-- Core Layer: Agent execution, thread lifecycle, LLM interaction (ThreadManager, CodexThread, Codex)
-- Protocol Layer: Message types, operations, events (Op enum, EventMsg enum, Event struct)
-- App Server: JSON-RPC for external clients like VS Code (MessageProcessor)
+- TUI communicates directly with ThreadManager via channels
+- MessageProcessor is ONLY for external JSON-RPC clients
+- Op enum: input to agent (UserTurn, ExecApproval, Interrupt)
+- EventMsg enum: output from agent (TurnStarted, TurnComplete, AgentMessage)
 
-### Communication Pattern
-TUI uses ThreadManager directly via submit(Op) and recv() on CodexThread. MessageProcessor is only for external JSON-RPC clients.
+## Source
 
-### Key Types
-- Op: Operations submitted to agent (UserTurn, ExecApproval, Interrupt, ApplyPatchApproval, Undo, RunUserShellCommand)
-- EventMsg: Events emitted by agent (TurnStarted, TurnComplete, ExecApprovalRequest, AgentMessage, ExecCommandBegin, ExecCommandEnd)
-- Event: Wrapper struct with id (String) and msg (EventMsg)
-
-## Source References
-
-All documentation references the OpenAI Codex repository:
-- TUI: https://github.com/openai/codex/tree/main/codex-rs/tui
-- Core: https://github.com/openai/codex/tree/main/codex-rs/core
-- Protocol: https://github.com/openai/codex/tree/main/codex-rs/protocol
-- App Server: https://github.com/openai/codex/tree/main/codex-rs/app-server
-
-## File Locations
-
-| Component | Path |
-|-----------|------|
-| App struct | codex-rs/tui/src/app.rs |
-| ChatWidget | codex-rs/tui/src/chatwidget.rs |
-| ApprovalOverlay | codex-rs/tui/src/bottom_pane/approval_overlay.rs |
-| ThreadManager | codex-rs/core/src/thread_manager.rs |
-| CodexThread | codex-rs/core/src/codex_thread.rs |
-| Codex | codex-rs/core/src/codex.rs |
-| Op enum | codex-rs/protocol/src/protocol.rs |
-| EventMsg enum | codex-rs/protocol/src/protocol.rs |
+https://github.com/openai/codex
