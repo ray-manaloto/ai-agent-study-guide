@@ -2,6 +2,10 @@
 
 > Learn to build AI coding agents by studying OpenAI Codex-RS architecture. This repository documents the TUI ↔ Agent communication patterns, event-driven architecture, and approval workflows used in production AI coding assistants.
 
+## Quick Start for AI Agents
+
+- [LLM-OPTIMIZATION-TEMPLATE.md](LLM-OPTIMIZATION-TEMPLATE.md): **Minimal template to LLM-optimize any project** - copy and adapt
+
 ## Documentation
 
 - [Architecture Diagram](docs/architecture-diagram.md): Mermaid sequence diagrams showing TUI ↔ Core Agent communication flow, approval workflows, and state machine
