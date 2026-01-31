@@ -15,9 +15,18 @@
 - [docs/PATTERNS.md](docs/PATTERNS.md): Implementation patterns
 - [docs/WORKFLOWS.md](docs/WORKFLOWS.md): Step-by-step task workflows
 
-## Template
+## Templates & Tools
 
-- [docs/templates/LLM-OPTIMIZATION-TEMPLATE.md](docs/templates/LLM-OPTIMIZATION-TEMPLATE.md): Reusable template to LLM-optimize any project
+- [docs/templates/LLM-OPTIMIZATION-TEMPLATE.md](docs/templates/LLM-OPTIMIZATION-TEMPLATE.md): Manual template to LLM-optimize any project
+- [docs/templates/llm-project-optimization/SKILL.md](docs/templates/llm-project-optimization/SKILL.md): Installable Agent Skill (agentskills.io format)
+
+### Automation Tools
+
+| Tool | Purpose |
+|------|---------|
+| [npx skills](https://github.com/vercel-labs/skills) | CLI to install/manage Agent Skills |
+| [agentskills.io](https://agentskills.io) | SKILL.md specification |
+| [skills.sh](https://skills.sh) | Skill discovery directory |
 
 ## Key Facts
 

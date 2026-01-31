@@ -256,9 +256,81 @@ EOF
 
 ---
 
+## Alternative: Agent Skills (SKILL.md)
+
+For **installable, reusable** capabilities, consider the [Agent Skills](https://agentskills.io) format:
+
+### What is SKILL.md?
+
+An open standard for packaging agent capabilities:
+- **YAML frontmatter** with `name` and `description`
+- **Markdown body** with instructions
+- **Installable** via `npx skills add`
+- **Discoverable** via [skills.sh](https://skills.sh)
+
+### SKILL.md vs AGENTS.md
+
+| Feature | SKILL.md | AGENTS.md |
+|---------|----------|-----------|
+| Purpose | Installable capability | Project instructions |
+| Format | YAML frontmatter + markdown | Pure markdown |
+| Install | `npx skills add` | Manual copy |
+| Scope | Reusable across projects | Single project |
+| Discovery | Indexed on skills.sh | Not indexed |
+
+### When to Use Which
+
+| Use AGENTS.md | Use SKILL.md |
+|---------------|--------------|
+| Project-specific context | Reusable workflow |
+| "How this codebase works" | "How to do X in any project" |
+| One repository | Published package |
+
+### Quick SKILL.md Example
+
+```yaml
+---
+name: my-skill
+description: What this skill does and when to use it.
+---
+
+# My Skill
+
+Instructions for the agent...
+```
+
+### Tools for Agent Skills
+
+```bash
+# Install the skills CLI
+npx skills
+
+# Add a skill to your project
+npx skills add vercel-labs/agent-skills
+
+# Create a new skill
+npx skills init
+
+# List installed skills
+npx skills list
+
+# Find skills
+npx skills find pdf-processing
+```
+
+### Resources
+
+- [Agent Skills Spec](https://agentskills.io/specification) - Full format spec
+- [skills.sh](https://skills.sh) - Skill discovery directory
+- [vercel-labs/skills](https://github.com/vercel-labs/skills) - CLI tool (3.7k stars)
+- [anthropics/skills](https://github.com/anthropics/skills) - Example skills
+
+---
+
 ## Reference Implementation
 
 See this repository for complete example:
-- 23 files demonstrating full optimization
+- 25+ files demonstrating full optimization
 - 8 AI tool configurations
 - Comprehensive workflow documentation
+- SKILL.md example at `docs/templates/llm-project-optimization/`

@@ -231,7 +231,32 @@ Key directories:
 
 ## Template for Other Projects
 
-See docs/templates/LLM-OPTIMIZATION-TEMPLATE.md for a reusable template to LLM-optimize any project.
+**Manual approach**: See docs/templates/LLM-OPTIMIZATION-TEMPLATE.md for a reusable template.
+
+**Automated approach**: Use the Agent Skills ecosystem:
+
+```bash
+# Install skills CLI
+npx skills
+
+# Add LLM optimization skill
+npx skills add ray-manaloto/ai-agent-study-guide/docs/templates/llm-project-optimization
+
+# Create your own skill
+npx skills init
+```
+
+### SKILL.md vs AGENTS.md
+
+| Feature | SKILL.md | AGENTS.md |
+|---------|----------|-----------|
+| Purpose | Installable capability | Project instructions |
+| Format | YAML frontmatter + markdown | Pure markdown |
+| Install | `npx skills add` | Manual copy |
+| Scope | Reusable across projects | Single project |
+| Discovery | Indexed on skills.sh | Not indexed |
+
+See: [docs/templates/llm-project-optimization/SKILL.md](docs/templates/llm-project-optimization/SKILL.md)
 
 ---
 

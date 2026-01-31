@@ -46,7 +46,19 @@ User Input → App → ThreadManager → CodexThread → Codex → LLM
 
 ## LLM-Optimize Your Own Project
 
-See [docs/templates/LLM-OPTIMIZATION-TEMPLATE.md](docs/templates/LLM-OPTIMIZATION-TEMPLATE.md) for a reusable template.
+**Manual approach**: See [docs/templates/LLM-OPTIMIZATION-TEMPLATE.md](docs/templates/LLM-OPTIMIZATION-TEMPLATE.md)
+
+**Automated approach**: Use [npx skills](https://github.com/vercel-labs/skills) CLI:
+
+```bash
+# Install skills CLI and add LLM optimization skill
+npx skills add ray-manaloto/ai-agent-study-guide/docs/templates/llm-project-optimization
+
+# Or create your own skill
+npx skills init
+```
+
+See also: [Agent Skills Spec](https://agentskills.io) | [SKILL.md example](docs/templates/llm-project-optimization/SKILL.md)
 
 ## Source Reference
 
