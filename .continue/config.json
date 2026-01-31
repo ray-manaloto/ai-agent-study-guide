@@ -8,6 +8,7 @@
         "files": [
           "AGENTS.md",
           "llms-full.txt",
+          "docs/WORKFLOWS.md",
           "docs/architecture-diagram.md"
         ]
       }
@@ -17,12 +18,7 @@
     {
       "name": "verify-mermaid",
       "description": "Verify Mermaid diagrams render correctly",
-      "command": "mmdc -i docs/architecture-diagram.md -o /tmp/test.png && echo 'Mermaid OK'"
-    },
-    {
-      "name": "update-index",
-      "description": "Reminder to update llms.txt after doc changes",
-      "command": "echo 'Remember to update llms.txt and llms-full.txt with new content'"
+      "command": "./scripts/render-diagrams.sh"
     }
   ],
   "docs": [
@@ -32,10 +28,10 @@
     }
   ],
   "rules": [
-    "This is a documentation-only repository",
-    "Use Mermaid for all architecture diagrams",
-    "Include GitHub source links in all documentation",
-    "Keep docs concise and LLM-optimized",
+    "Documentation-only repository",
+    "Read docs/WORKFLOWS.md for task execution",
+    "Read docs/AGENTS.md when working in docs/",
+    "Use Mermaid for diagrams",
     "TUI communicates directly with ThreadManager, NOT MessageProcessor"
   ]
 }

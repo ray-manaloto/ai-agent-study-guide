@@ -1,43 +1,30 @@
-# Cursor AI Rules for AI Agent Study Guide
+# Cursor AI Rules
+
+## Entry Points
+- AGENTS.md - AI instructions
+- llms.txt - Doc index
+- docs/AGENTS.md - Subdirectory context
+- docs/WORKFLOWS.md - Task steps
 
 ## Project Type
-Documentation repository - no implementation code.
+Documentation-only. No implementation code.
 
-## Context
-This repo documents OpenAI Codex-RS architecture to teach AI agent development patterns.
-
-## Key Files to Reference
-- docs/architecture-diagram.md - Mermaid diagrams (primary source of truth)
-- docs/codex-architecture.html - Interactive HTML diagrams
+## Key Files
+- docs/architecture-diagram.md - Mermaid diagrams
+- docs/WORKFLOWS.md - Step-by-step tasks
 - llms-full.txt - Complete context
 
-## Documentation Standards
-
-### Diagrams
-- Use Mermaid syntax
-- Include source file links to GitHub
-- Validate against actual Codex-RS code
-
-### Writing Style
+## Style
 - Concise, no filler
-- Use tables for mappings
-- Include Rust code snippets
-- Explicit over implicit
+- Tables for mappings
+- Include GitHub source links
+- Mermaid for diagrams
 
-## Architecture Facts
-
-### Critical Understanding
+## Architecture Fact
 TUI → ThreadManager (direct)
 NOT: TUI → MessageProcessor → ThreadManager
 
-MessageProcessor is ONLY for external JSON-RPC clients.
-
-### Key Types
-- Op: UserTurn, ExecApproval, Interrupt, Undo
-- EventMsg: TurnStarted, TurnComplete, ExecApprovalRequest, AgentMessage
-- Event: { id: String, msg: EventMsg }
-
 ## Do Not
 - Create implementation code
-- Add build dependencies
-- Modify diagrams without source verification
+- Add dependencies
+- Modify HTML directly

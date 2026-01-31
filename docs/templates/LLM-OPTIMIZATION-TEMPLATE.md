@@ -2,14 +2,24 @@
 
 > Minimal guide to make any project AI/LLM agent-friendly. Copy and adapt.
 
-## Required Files (4)
+## Core Principles
+
+1. **AGENTS.md ≠ README.md** - Separate content for AI vs humans
+2. **Nested AGENTS.md** - Each subdirectory can have its own
+3. **Entry points are minimal** - Link to details, don't duplicate
+4. **Tool configs agree** - All tools reference same entry points
+
+## Required Files
 
 ```
 project/
-├── AGENTS.md      # AI agent instructions
-├── llms.txt       # Documentation index  
-├── llms-full.txt  # Complete context
-└── README.md      # Overview
+├── AGENTS.md         # AI entry point (minimal, links to details)
+├── README.md         # Human entry point (includes "For AI: see AGENTS.md")
+├── llms.txt          # Documentation index
+├── llms-full.txt     # Complete context
+└── docs/
+    ├── AGENTS.md     # Subdirectory context
+    └── WORKFLOWS.md  # Task execution steps
 ```
 
 ---
@@ -107,17 +117,18 @@ Expand llms.txt with:
 
 ### Minimum Viable
 - [ ] AGENTS.md with setup + structure + tasks
+- [ ] README.md with "For AI: see AGENTS.md"
 - [ ] llms.txt with docs index
-- [ ] README.md for humans
 
 ### Recommended
 - [ ] llms-full.txt with complete context
-- [ ] .cursorrules or equivalent
-- [ ] Task workflows documented
+- [ ] docs/AGENTS.md for subdirectory context
+- [ ] docs/WORKFLOWS.md with task steps
+- [ ] Tool config (e.g., .cursorrules)
 
 ### Full Optimization
-- [ ] All 8 tool configs
-- [ ] docs/WORKFLOWS.md with step-by-step
+- [ ] All tool configs referencing same entry points
+- [ ] Nested AGENTS.md in each major subdirectory
 - [ ] docs/GLOSSARY.md for terms
 - [ ] .gitingest for repo-to-text
 
@@ -127,11 +138,13 @@ Expand llms.txt with:
 
 | Bad | Good |
 |-----|------|
-| Verbose prose | Tables + bullets |
-| Implicit knowledge | Explicit facts |
-| Scattered docs | Centralized index |
-| No task list | Clear allowed/forbidden |
-| Missing commands | Copy-paste setup |
+| README duplicates AGENTS.md | README points to AGENTS.md |
+| Template at root | Template in docs/templates/ |
+| Tool configs disagree | All configs reference same entry points |
+| Verbose root AGENTS.md | Minimal entry point, link to details |
+| No subdirectory context | docs/AGENTS.md for local rules |
+| Scattered docs | Centralized index (llms.txt) |
+| No task workflows | docs/WORKFLOWS.md with steps |
 
 ---
 
@@ -149,27 +162,33 @@ Expand llms.txt with:
 
 ### Minimal .cursorrules
 ```
-Project: [name]
-Type: [type]
-Stack: [stack]
+## Entry Points
+- AGENTS.md - AI instructions
+- llms.txt - Doc index
+- docs/AGENTS.md - Subdirectory context
+- docs/WORKFLOWS.md - Task steps
 
-Rules:
-- [rule 1]
-- [rule 2]
+## Project Type
+[type]. [key constraint].
 
-Key files: [file1], [file2]
+## Do Not
+- [forbidden 1]
+- [forbidden 2]
 ```
 
 ### Minimal CLAUDE.md
 ```markdown
 # Claude Code Config
 
-## Context
-[One paragraph project description]
+## Entry Points
+| Priority | File | Purpose |
+|----------|------|---------|
+| 1 | AGENTS.md | AI instructions |
+| 2 | llms.txt | Doc index |
+| 3 | docs/WORKFLOWS.md | Task steps |
 
-## Key Files
-- file1: purpose
-- file2: purpose
+## Subdirectory Context
+When in docs/, also read docs/AGENTS.md.
 
 ## Commands
 \`\`\`bash

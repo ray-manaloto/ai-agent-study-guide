@@ -1,23 +1,24 @@
 # GitHub Copilot Instructions
 
-## Project Context
-Documentation repository studying OpenAI Codex-RS AI agent architecture. No implementation code.
+## Entry Points
+- AGENTS.md - AI instructions
+- llms.txt - Doc index
+- docs/WORKFLOWS.md - Task execution steps
+- docs/AGENTS.md - Subdirectory context
 
-## Primary Tasks
-1. Add/update Mermaid diagrams in `docs/`
-2. Write concise, LLM-optimized documentation
-3. Maintain `llms.txt` and `llms-full.txt` indexes
+## Project Type
+Documentation-only. No implementation code.
 
-## Code Patterns
-- Mermaid for all diagrams
-- Rust code snippets for type examples
-- Tables for component mappings
-- Links to GitHub source files
-
-## Key Architecture Fact
-TUI communicates directly with ThreadManager via channels, NOT through MessageProcessor.
+## Tasks
+1. Add/update Mermaid diagrams in docs/
+2. Update llms.txt and llms-full.txt indexes
+3. Follow docs/WORKFLOWS.md for step-by-step
 
 ## File Restrictions
-- DO modify: `docs/*.md`, `*.txt`, `README.md`
-- DO NOT modify: `docs/codex-architecture.html` (generated)
-- DO NOT create: Implementation code, new dependencies
+- DO modify: docs/*.md, *.txt, README.md
+- DO NOT modify: docs/codex-architecture.html
+- DO NOT create: Implementation code
+
+## Key Fact
+TUI → ThreadManager (direct)
+NOT: TUI → MessageProcessor → ThreadManager

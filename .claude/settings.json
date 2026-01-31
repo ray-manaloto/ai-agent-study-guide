@@ -5,10 +5,17 @@
     "description": "Documentation repository for studying OpenAI Codex-RS architecture"
   },
   "context": {
+    "entryPoints": [
+      "AGENTS.md",
+      "llms.txt"
+    ],
     "primaryFiles": [
-      "docs/architecture-diagram.md",
-      "docs/codex-architecture.html",
-      "llms-full.txt"
+      "llms-full.txt",
+      "docs/WORKFLOWS.md",
+      "docs/architecture-diagram.md"
+    ],
+    "subdirectoryAgents": [
+      "docs/AGENTS.md"
     ],
     "llmOptimized": true
   },
@@ -18,9 +25,6 @@
     "documentationStyle": "concise"
   },
   "externalReferences": {
-    "codexRepo": "https://github.com/openai/codex",
-    "tuiSource": "https://github.com/openai/codex/tree/main/codex-rs/tui",
-    "coreSource": "https://github.com/openai/codex/tree/main/codex-rs/core",
-    "protocolSource": "https://github.com/openai/codex/tree/main/codex-rs/protocol"
+    "codexRepo": "https://github.com/openai/codex"
   }
 }
