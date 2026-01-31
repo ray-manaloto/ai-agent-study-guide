@@ -1,0 +1,11 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Codex-RS Source
+    url: https://github.com/openai/codex
+    about: View the original Codex-RS source code being documented
+  - name: Discussions
+    url: https://github.com/ray-manaloto/ai-agent-study-guide/discussions
+    about: Ask questions and discuss ideas
+  - name: llms.txt Standard
+    url: https://llmstxt.org/
+    about: Learn about the llms.txt documentation standard
