@@ -1,0 +1,128 @@
+name: Documentation Validation
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - '**.md'
+      - 'llms.txt'
+      - 'llms-full.txt'
+  pull_request:
+    branches: [main]
+    paths:
+      - '**.md'
+      - 'llms.txt'
+      - 'llms-full.txt'
+
+jobs:
+  markdown-lint:
+    name: Markdown Lint
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Run markdownlint
+        uses: DavidAnson/markdownlint-cli2-action@v18
+        with:
+          globs: |
+            **/*.md
+            !node_modules/**
+        continue-on-error: true  # Don't fail on lint warnings initially
+
+  link-check:
+    name: Link Validation
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Check Markdown links
+        uses: gaurav-nelson/github-action-markdown-link-check@v1
+        with:
+          use-quiet-mode: 'yes'
+          use-verbose-mode: 'yes'
+          config-file: '.github/mlc_config.json'
+        continue-on-error: true  # External links may be temporarily unavailable
+
+  mermaid-check:
+    name: Mermaid Syntax
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      
+      - name: Install Mermaid CLI
+        run: npm install -g @mermaid-js/mermaid-cli
+      
+      - name: Validate Mermaid diagrams
+        run: |
+          # Extract and validate Mermaid blocks from markdown files
+          for file in $(find docs -name "*.md"); do
+            echo "Checking $file for Mermaid diagrams..."
+            # Extract mermaid blocks and validate syntax
+            grep -Pzo '```mermaid\n[\s\S]*?```' "$file" 2>/dev/null | \
+              sed 's/```mermaid//' | sed 's/```//' > /tmp/diagram.mmd 2>/dev/null || true
+            if [ -s /tmp/diagram.mmd ]; then
+              mmdc -i /tmp/diagram.mmd -o /tmp/diagram.svg --quiet || echo "Warning: Mermaid syntax issue in $file"
+            fi
+          done
+        continue-on-error: true
+
+  file-structure:
+    name: File Structure Check
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Verify required files exist
+        run: |
+          echo "Checking required AI-first files..."
+          required_files=(
+            "README.md"
+            "AGENTS.md"
+            "CLAUDE.md"
+            ".cursorrules"
+            "llms.txt"
+            "ARCHITECTURE.md"
+            "IMPLEMENTATION.md"
+            "TOOLING.md"
+          )
+          
+          missing=0
+          for file in "${required_files[@]}"; do
+            if [ ! -f "$file" ]; then
+              echo "::error::Missing required file: $file"
+              missing=$((missing + 1))
+            else
+              lines=$(wc -l < "$file")
+              echo "✓ $file ($lines lines)"
+            fi
+          done
+          
+          if [ $missing -gt 0 ]; then
+            echo "::error::$missing required files missing"
+            exit 1
+          fi
+      
+      - name: Check documentation coverage
+        run: |
+          echo "Documentation line counts:"
+          echo "=========================="
+          total=0
+          for file in README.md AGENTS.md CLAUDE.md ARCHITECTURE.md IMPLEMENTATION.md TOOLING.md llms.txt .cursorrules; do
+            if [ -f "$file" ]; then
+              lines=$(wc -l < "$file")
+              total=$((total + lines))
+              printf "%-25s %5d lines\n" "$file" "$lines"
+            fi
+          done
+          echo "=========================="
+          printf "%-25s %5d lines\n" "TOTAL" "$total"
+          
+          # Check minimum thresholds
+          if [ $total -lt 2000 ]; then
+            echo "::warning::Total documentation is below recommended 2000 lines"
+          fi
