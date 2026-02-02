@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>AI Coding Agents - Interactive Overview</title>
-    <script src="https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/mermaid@9.4.3/dist/mermaid.min.js"></script>
     <style>
         :root {
             --bg-primary: #0d1117;
@@ -412,7 +412,7 @@
     <div class="container">
         <header>
             <h1>AI Coding Agent Tools</h1>
-            <p class="subtitle">Interactive comparison of 7 production AI coding agents</p>
+            <p class="subtitle">Interactive comparison of 8 production AI coding agents</p>
             <p style="color: var(--text-secondary); margin-top: 15px; font-size: 0.9rem;">
                 Click on diagram nodes or tool cards to explore details
             </p>
@@ -451,19 +451,19 @@
             <div class="mermaid">
 flowchart TB
     subgraph CLI["CLI/TUI Agents"]
-        Codex["Codex<br/>Rust TUI"]
-        Claude["Claude Code<br/>MCP Integration"]
-        OpenCode["OpenCode<br/>Multi-Provider"]
+        Codex[Codex - Rust TUI]
+        Claude[Claude Code - MCP]
+        OpenCode[OpenCode - Multi-Provider]
     end
 
     subgraph Frameworks["Orchestration Frameworks"]
-        Kata["Kata<br/>Spec-Driven"]
-        OMOC["Oh-My-OpenCode<br/>Swarm/Hive"]
-        GSD["Get-Shit-Done<br/>Productivity"]
+        Kata[Kata - Spec-Driven]
+        OMOC[Oh-My-OpenCode - Swarm]
+        GSD[Get-Shit-Done]
     end
 
     subgraph Models["Model-Native Agents"]
-        Kimi["Kimi K2<br/>100-Agent Swarm"]
+        Kimi[Kimi K2 - 100 Agents]
     end
 
     User[User] --> CLI
@@ -480,10 +480,6 @@ flowchart TB
     click OMOC "oh-my-opencode/README.md" "View Oh-My-OpenCode documentation"
     click GSD "get-shit-done/README.md" "View Get-Shit-Done documentation"
     click Kimi "kimi-k2/README.md" "View Kimi K2 documentation"
-
-    style CLI fill:#1a2744,stroke:#58a6ff
-    style Frameworks fill:#2d1f3d,stroke:#a371f7
-    style Models fill:#3d1f2d,stroke:#db61a2
             </div>
 
             <div class="tool-grid">
@@ -754,23 +750,20 @@ flowchart TB
             <p class="diagram-desc">Compare how each tool structures its agent loop and communication patterns.</p>
 
             <div class="mermaid">
-flowchart LR
+flowchart TB
     subgraph Codex["Codex Architecture"]
-        direction TB
         C_TUI[TUI Layer] -->|Op| C_Thread[CodexThread]
         C_Thread -->|EventMsg| C_TUI
         C_Thread --> C_Agent[Codex Agent]
     end
 
     subgraph Claude["Claude Code Architecture"]
-        direction TB
         CC_CLI[CLI] -->|MCP| CC_Tools[Tool Registry]
         CC_Tools --> CC_Agent[Claude Agent]
         CC_Agent -->|Task| CC_Sub[Subagent]
     end
 
     subgraph OpenCode["OpenCode Architecture"]
-        direction TB
         OC_TUI[TUI/CLI] --> OC_Client[Client]
         OC_Client --> OC_Server[Server]
         OC_Server --> OC_Provider[Provider]
@@ -781,16 +774,11 @@ flowchart LR
     click CC_CLI "claude-code/README.md#architecture" "Claude Code architecture"
     click CC_Sub "claude-code/README.md#subagent-delegation" "Subagent delegation"
     click OC_TUI "opencode/README.md#architecture" "OpenCode architecture"
-
-    style Codex fill:#1a2744,stroke:#58a6ff
-    style Claude fill:#2d2a1a,stroke:#d29922
-    style OpenCode fill:#1a3d2e,stroke:#3fb950
             </div>
 
             <div class="mermaid">
-flowchart LR
+flowchart TB
     subgraph Kata["Kata Architecture"]
-        direction TB
         K_Skill[Skill] --> K_Orch[Orchestrator]
         K_Orch --> K_Agent1[Agent 1]
         K_Orch --> K_Agent2[Agent 2]
@@ -798,14 +786,12 @@ flowchart LR
     end
 
     subgraph OMOC["Oh-My-OpenCode Architecture"]
-        direction TB
         OM_Main[Sisyphus] --> OM_Plan[Prometheus]
         OM_Main --> OM_Exec[Atlas]
         OM_Exec --> OM_Worker[Junior]
     end
 
     subgraph Kimi["Kimi K2 Architecture"]
-        direction TB
         KM_Orch[Orchestrator] --> KM_Decomp[Decomposition]
         KM_Decomp --> KM_Swarm[100 Agents]
         KM_Swarm --> KM_Agg[Aggregation]
@@ -814,10 +800,6 @@ flowchart LR
     click K_Orch "kata/README.md#orchestration-patterns" "Kata orchestration"
     click OM_Main "oh-my-opencode/README.md#agent-system" "Agent system"
     click KM_Swarm "kimi-k2/README.md#parl-training" "PARL training"
-
-    style Kata fill:#1a3d3d,stroke:#39c5cf
-    style OMOC fill:#2d1f3d,stroke:#a371f7
-    style Kimi fill:#3d1f2d,stroke:#db61a2
             </div>
         </div>
 
@@ -861,11 +843,6 @@ flowchart TB
     click D_Main "claude-code/README.md#subagent-delegation" "Delegation pattern"
     click P_Plan "kata/README.md#8-phase-development-lifecycle" "Phase-based pattern"
     click SW_Orch "kimi-k2/README.md#parl-training" "Swarm pattern"
-
-    style Single fill:#1a2744,stroke:#58a6ff
-    style Delegation fill:#2d2a1a,stroke:#d29922
-    style Phase fill:#1a3d3d,stroke:#39c5cf
-    style Swarm fill:#3d1f2d,stroke:#db61a2
             </div>
         </div>
 
@@ -908,9 +885,6 @@ flowchart TB
     click OC_Plugins "opencode/README.md#customization-points" "OpenCode customization"
     click OMOC_Cat "oh-my-opencode/README.md#customization-points" "OMOC customization"
     click Kata_XML "kata/README.md#customization-points" "Kata customization"
-
-    style Common fill:#1a3d2e,stroke:#3fb950
-    style ByTool fill:#2d1f3d,stroke:#a371f7
             </div>
         </div>
 
