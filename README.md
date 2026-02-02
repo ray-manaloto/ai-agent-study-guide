@@ -6,7 +6,7 @@
 [![AI Optimized](https://img.shields.io/badge/AI-Optimized-purple)](AGENTS.md)
 [![llms.txt](https://img.shields.io/badge/llms.txt-available-orange)](llms.txt)
 
-Learn to build AI coding agents by studying 7 production implementations.
+Learn to build AI coding agents by studying 8 production implementations.
 
 > **For AI Agents**: See [AGENTS.md](AGENTS.md) | [llms.txt](llms.txt) | [.opencode/agent/](.opencode/agent/)
 
@@ -14,12 +14,13 @@ Learn to build AI coding agents by studying 7 production implementations.
 
 ## Overview
 
-A documentation repository analyzing architecture patterns from 7 leading AI coding agent implementations. No code—just architecture documentation, patterns, and insights for building your own AI coding agents.
+A documentation repository analyzing architecture patterns from 8 leading AI coding agent implementations. No code—just architecture documentation, patterns, and insights for building your own AI coding agents.
 
 ### Tools Studied
 
 | Tool | Type | Key Architecture | Documentation |
 |------|------|------------------|---------------|
+| [Aider](docs/tools/aider/) | CLI | Repository Map, Architect/Editor, LiteLLM | [README](docs/tools/aider/README.md) |
 | [Codex](docs/tools/codex/) | CLI/TUI | Rust channels, typed protocols | [README](docs/tools/codex/README.md) |
 | [Claude Code](docs/tools/claude-code/) | CLI | MCP integration, subagent delegation | [README](docs/tools/claude-code/README.md) |
 | [OpenCode](docs/tools/opencode/) | CLI/TUI | Multi-provider, session forking | [README](docs/tools/opencode/README.md) |
@@ -83,7 +84,7 @@ ls .opencode/agent/
 
 ## What You'll Learn
 
-### Core Patterns (from all 7 tools)
+### Core Patterns (from all 8 tools)
 
 | Pattern | Description | Key Sources |
 |---------|-------------|-------------|
@@ -122,13 +123,14 @@ Trainable Orchestrator → [Frozen Agent A, B, C, ...] → Critical Steps Optimi
 | Path | Description |
 |------|-------------|
 | [docs/tools/README.md](docs/tools/README.md) | Landing page with comparison matrix |
-| [docs/tools/BEST-PRACTICES.md](docs/tools/BEST-PRACTICES.md) | **Combined best practices from all 7 tools** |
+| [docs/tools/BEST-PRACTICES.md](docs/tools/BEST-PRACTICES.md) | **Combined best practices from all 8 tools** |
 | [docs/tools/UNIFIED-HARNESS.md](docs/tools/UNIFIED-HARNESS.md) | **Multi-provider harness architecture** |
 
 ### Individual Tool Documentation
 
 | Tool | README | Key Focus |
 |------|--------|-----------|
+| Aider | [docs/tools/aider/](docs/tools/aider/) | Repository Map, multi-model |
 | Codex | [docs/tools/codex/](docs/tools/codex/) | Channel-based TUI architecture |
 | Claude Code | [docs/tools/claude-code/](docs/tools/claude-code/) | MCP and subagent delegation |
 | OpenCode | [docs/tools/opencode/](docs/tools/opencode/) | Multi-provider abstraction |
@@ -163,6 +165,7 @@ Trainable Orchestrator → [Frozen Agent A, B, C, ...] → Critical Steps Optimi
 
 | Tool | Max Agents | Coordination | Communication |
 |------|------------|--------------|---------------|
+| Aider | 2 | Architect/Editor | Mode switching |
 | Codex | 1 | N/A | Direct channel |
 | Claude Code | 1 + subagents | Task delegation | Context passing |
 | OpenCode | 2 (plan/build) | Tab switching | Shared context |
@@ -174,6 +177,7 @@ Trainable Orchestrator → [Frozen Agent A, B, C, ...] → Critical Steps Optimi
 
 | Tool | Anthropic | OpenAI | Google | Local | Other |
 |------|-----------|--------|--------|-------|-------|
+| Aider | ✅ | ✅ | ✅ | ✅ | 50+ via LiteLLM |
 | Codex | - | ✅ | - | - | - |
 | Claude Code | ✅ | - | - | - | - |
 | OpenCode | ✅ | ✅ | ✅ | ✅ | Many |
@@ -239,7 +243,7 @@ We welcome contributions! Please see:
 
 ### Repository Stats
 
-- **Tools Documented**: 7 production AI coding agents
+- **Tools Documented**: 8 production AI coding agents
 - **Total Documentation**: 10,000+ lines
 - **Best Practices**: 10 major categories synthesized
 - **Agent Guides**: 15 specialized guides
@@ -250,7 +254,7 @@ We welcome contributions! Please see:
 |----------|-------|---------|
 | Documentation | 9.5 | Comprehensive multi-tool coverage |
 | AI/LLM Optimization | 9.0 | All core files + agent guides |
-| Patterns & Practices | 9.0 | Synthesized from 7 production tools |
+| Patterns & Practices | 9.0 | Synthesized from 8 production tools |
 | **Overall** | **9.0** | Production-ready reference |
 
 ---
@@ -259,6 +263,7 @@ We welcome contributions! Please see:
 
 | Tool | Repository |
 |------|------------|
+| Aider | [github.com/paul-gauthier/aider](https://github.com/paul-gauthier/aider) |
 | Codex | [github.com/openai/codex](https://github.com/openai/codex) |
 | Claude Code | Anthropic (Closed Source) |
 | OpenCode | [github.com/anomalyco/opencode](https://github.com/anomalyco/opencode) |
@@ -277,7 +282,7 @@ MIT - See [LICENSE](LICENSE) for details.
 
 ## Acknowledgments
 
-- All 7 tools studied for their innovative architectures
+- All 8 tools studied for their innovative architectures
 - [Mermaid](https://mermaid.js.org/) - Diagram syntax
 - [llms.txt](https://llmstxt.org/) - Index format standard
 - [Agent Skills](https://agentskills.io) - Skills specification

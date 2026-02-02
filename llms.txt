@@ -1,6 +1,6 @@
 # AI Agent Study Guide
 
-> Documentation repository studying 7 AI coding agent implementations for building your own agents.
+> Documentation repository studying 8 AI coding agent implementations for building your own agents.
 
 Sources:
 - Aider: https://github.com/paul-gauthier/aider
@@ -38,7 +38,7 @@ Sources:
 | File | Purpose | Key Content |
 |------|---------|-------------|
 | [docs/tools/README.md](docs/tools/README.md) | Landing page | Comparison matrix, tool categories |
-| [docs/tools/BEST-PRACTICES.md](docs/tools/BEST-PRACTICES.md) | **Best practices** | 10 pattern categories from all 7 tools |
+| [docs/tools/BEST-PRACTICES.md](docs/tools/BEST-PRACTICES.md) | **Best practices** | 10 pattern categories from all 8 tools |
 | [docs/tools/UNIFIED-HARNESS.md](docs/tools/UNIFIED-HARNESS.md) | **Harness design** | Multi-provider, multi-agent architecture |
 | [docs/tools/interactive-tools-overview.html](docs/tools/interactive-tools-overview.html) | **Interactive diagrams** | Clickable architecture diagrams, tool comparison |
 
@@ -188,7 +188,8 @@ ai-agent-study-guide/
 │       ├── kata/
 │       ├── get-shit-done/
 │       ├── oh-my-opencode/
-│       └── kimi-k2/
+│       ├── kimi-k2/
+│       └── aider/
 ├── .opencode/agent/       # 15 agent guides
 └── scripts/
     └── render-diagrams.sh

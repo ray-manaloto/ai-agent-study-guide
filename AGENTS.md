@@ -1,24 +1,25 @@
 # AGENTS.md
 
-> AI Agent Study Guide - Learn to build coding agents by studying 7 production implementations
+> AI Agent Study Guide - Learn to build coding agents by studying 8 production implementations
 
 ---
 
 ## Project Overview
 
-This repository documents the architecture of 7 leading AI coding agent implementations. By studying these production tools, we extract patterns and insights for building similar systems.
+This repository documents the architecture of 8 leading AI coding agent implementations. By studying these production tools, we extract patterns and insights for building similar systems.
 
 | Attribute | Value |
 |-----------|-------|
 | Repository Type | Documentation only |
 | Implementation Code | **NONE** (reference architecture only) |
-| Tools Studied | Codex, Claude Code, OpenCode, Kata, Get-Shit-Done, Oh-My-OpenCode, Kimi K2 |
+| Tools Studied | Aider, Codex, Claude Code, OpenCode, Kata, Get-Shit-Done, Oh-My-OpenCode, Kimi K2 |
 | Primary Focus | Multi-agent orchestration patterns |
 
 ### Tools Covered
 
 | Tool | Type | Source | Key Contribution |
 |------|------|--------|------------------|
+| Aider | CLI | [paul-gauthier/aider](https://github.com/paul-gauthier/aider) | Repository Map, Architect/Editor |
 | Codex | CLI/TUI | [openai/codex](https://github.com/openai/codex) | Channel-based architecture |
 | Claude Code | CLI | Anthropic (Closed) | MCP integration, subagents |
 | OpenCode | CLI/TUI | [anomalyco/opencode](https://github.com/anomalyco/opencode) | Multi-provider abstraction |
