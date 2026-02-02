@@ -1,6 +1,6 @@
 # AI Coding Agent Best Practices
 
-> Combined best practices extracted from 7 production AI coding agent tools
+> Combined best practices extracted from 8 production AI coding agent tools
 
 ---
 
@@ -10,6 +10,7 @@ This document synthesizes the most effective patterns and practices from studyin
 
 | Tool | Key Contribution |
 |------|------------------|
+| **Aider** | Repository Map (tree-sitter), Architect/Editor dual-model, Git-native workflow |
 | **Codex** | Channel-based architecture, typed protocols, approval queues |
 | **Claude Code** | MCP integration, subagent delegation, permission systems |
 | **OpenCode** | Multi-provider abstraction, session management, LSP integration |
@@ -39,7 +40,7 @@ This document synthesizes the most effective patterns and practices from studyin
 
 ### 1.1 Thin Orchestrator Pattern
 
-**Sources**: Kata, Get-Shit-Done, Oh-My-OpenCode
+**Sources**: Kata, Get-Shit-Done, Oh-My-OpenCode, Aider (Architect mode)
 
 The most critical pattern for effective multi-agent systems: keep orchestrators thin and spawn subagents with fresh context.
 
@@ -90,12 +91,39 @@ async function orchestrateBad(task: Task) {
 }
 ```
 
-### 1.2 Context Window Management
+### 1.2 Repository Map Pattern (NEW)
+
+**Source**: Aider
+
+Use AST analysis (tree-sitter) to create a compressed map of the entire repository, showing classes, functions, and signatures without full file contents.
+
+```
+aider/coders/base_coder.py:
+│class Coder:
+│    @classmethod
+│    def create(self, main_model, edit_format, io, **kwargs):
+│    def run(self, with_message=None):
+```
+
+**Benefits**:
+- Whole-project awareness without token explosion
+- Relevance-ranked symbols based on git history
+- Dynamic token budget (expands/contracts as needed)
+- 100+ language support via tree-sitter
+
+**Implementation Strategy**:
+1. Parse all files with tree-sitter
+2. Extract symbol definitions (classes, functions, signatures)
+3. Rank by relevance (git history, references)
+4. Fit within token budget (default ~1k tokens)
+
+### 1.3 Context Window Management
 
 **Sources**: All tools
 
 | Strategy | Tool | Description |
 |----------|------|-------------|
+| Repository Map | Aider | Tree-sitter based whole-project context |
 | Automatic compaction | Claude Code, OpenCode | Compress old messages automatically |
 | Artifact persistence | Kata, GSD | Store artifacts in `.planning/`, `.sisyphus/` |
 | Lazy loading | Oh-My-OpenCode | Load skills/tools on demand |
@@ -182,9 +210,31 @@ Session End         ┌─────────────┐
             └──────────────────────────────────────┘
 ```
 
-### 2.2 Agent Specialization
+### 2.2 Architect/Editor Dual-Model Pattern (NEW)
 
-**Sources**: Oh-My-OpenCode, Kata, GSD
+**Source**: Aider
+
+Separate "reasoning about code" from "editing code" using two specialized models:
+
+```
+User Request → [Architect Model] → Solution Proposal → [Editor Model] → File Edits
+               (Reasoning)                            (Structured output)
+```
+
+**Benefits**:
+- Use expensive reasoning models (o1, o3) for planning
+- Use cheaper models (gpt-4o-mini, haiku) for execution
+- Mix providers (o1 Architect + Claude Editor)
+- 85%+ accuracy on benchmarks with this approach
+
+**Configuration (Aider)**:
+```bash
+aider --architect --editor-model gpt-4o-mini
+```
+
+### 2.3 Agent Specialization
+
+**Sources**: Oh-My-OpenCode, Kata, GSD, Aider
 
 **Anti-Pattern**: Generic agents doing everything
 **Pattern**: Specialized agents with clear boundaries
@@ -193,6 +243,7 @@ Session End         ┌─────────────┐
 |------------|----------------|---------------|
 | Researcher | Gather information | Read-only, broad access |
 | Architect | Design decisions | System overview, patterns |
+| Editor | Apply code changes | Focused files, diff format |
 | Coder | Implementation | Focused files, tests |
 | Reviewer | Quality checks | Diff view, standards |
 | Tester | Verification | Test frameworks, coverage |

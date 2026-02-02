@@ -10,6 +10,7 @@ This directory contains detailed documentation for leading AI coding agent tools
 
 | Tool | Type | Provider Support | Multi-Agent | Key Feature |
 |------|------|------------------|-------------|-------------|
+| [Aider](#aider) | CLI | **Multi (50+)** | Architect + Editor | Repository Map, Voice |
 | [Codex](#codex) | CLI/TUI | OpenAI | Single | Rust TUI, Direct Channels |
 | [Claude Code](#claude-code) | CLI | Anthropic | Single + Delegation | MCP Integration |
 | [OpenCode](#opencode) | CLI/TUI | Multi-Provider | Built-in Agents | 100% Open Source |
@@ -28,6 +29,7 @@ Tools that provide direct terminal-based AI coding assistance:
 
 | Tool | Language | Architecture | Source |
 |------|----------|--------------|--------|
+| Aider | Python | CLI + LiteLLM | [paul-gauthier/aider](https://github.com/paul-gauthier/aider) |
 | Codex | Rust | TUI + Channels | [openai/codex](https://github.com/openai/codex) |
 | Claude Code | TypeScript | CLI + MCP | Anthropic (Closed) |
 | OpenCode | TypeScript | TUI + Client/Server | [anomalyco/opencode](https://github.com/anomalyco/opencode) |
@@ -53,6 +55,26 @@ Models with built-in agentic capabilities:
 ---
 
 ## Detailed Tool Profiles
+
+### Aider
+
+**Type**: AI Pair Programming CLI  
+**Source**: [github.com/paul-gauthier/aider](https://github.com/paul-gauthier/aider)  
+**Stars**: 26k+  
+**Language**: Python
+
+The most popular open-source AI coding assistant. Features repository-aware context via tree-sitter analysis and supports 50+ models via LiteLLM.
+
+**Key Architecture**:
+- Repository Map (tree-sitter based whole-project context)
+- Multiple edit formats (diff, whole, udiff, architect)
+- Git-native workflow with auto-commits
+- Architect/Editor dual-model system
+- Voice coding support
+
+**Documentation**: [aider/](aider/)
+
+---
 
 ### Codex
 
@@ -186,6 +208,7 @@ Spec-driven development orchestrator for Claude Code. Features phase-based workf
 
 | Tool | Agent Loop Type | Message Format | Async Model |
 |------|-----------------|----------------|-------------|
+| Aider | Interactive CLI | Streaming | Python async |
 | Codex | Channel-based | Op/EventMsg enums | Tokio async |
 | Claude Code | MCP-based | JSON-RPC | Node async |
 | OpenCode | Client/Server | JSON | Bun async |
@@ -196,6 +219,7 @@ Spec-driven development orchestrator for Claude Code. Features phase-based workf
 
 | Tool | Max Agents | Coordination | Communication |
 |------|------------|--------------|---------------|
+| Aider | 2 (architect/editor) | Dual-model | Sequential |
 | Codex | 1 | N/A | Direct channel |
 | Claude Code | 1 + subagents | Task delegation | Context passing |
 | OpenCode | 2 (plan/build) | Tab switching | Shared context |
@@ -207,6 +231,7 @@ Spec-driven development orchestrator for Claude Code. Features phase-based workf
 
 | Tool | Anthropic | OpenAI | Google | Local | Other |
 |------|-----------|--------|--------|-------|-------|
+| Aider | **Yes** | **Yes** | **Yes** | **Yes** | **50+ via LiteLLM** |
 | Codex | - | Yes | - | - | - |
 | Claude Code | Yes | - | - | - | - |
 | OpenCode | Yes | Yes | Yes | Yes | Many |
@@ -275,6 +300,7 @@ Features:
 
 | Tool | Documentation | Diagrams | Examples |
 |------|---------------|----------|----------|
+| Aider | [README](aider/README.md) | [Diagrams](aider/README.md#architecture) | [Examples](aider/README.md#integration-patterns) |
 | Codex | [README](codex/README.md) | [Diagrams](codex/diagrams.md) | [Examples](codex/examples.md) |
 | Claude Code | [README](claude-code/README.md) | [Diagrams](claude-code/diagrams.md) | [Examples](claude-code/examples.md) |
 | OpenCode | [README](opencode/README.md) | [Diagrams](opencode/diagrams.md) | [Examples](opencode/examples.md) |

@@ -3,6 +3,7 @@
 > Documentation repository studying 7 AI coding agent implementations for building your own agents.
 
 Sources:
+- Aider: https://github.com/paul-gauthier/aider
 - Codex: https://github.com/openai/codex
 - Claude Code: Anthropic (Closed)
 - OpenCode: https://github.com/anomalyco/opencode
@@ -45,6 +46,7 @@ Sources:
 
 | Tool | File | Key Architecture | Customization Points |
 |------|------|------------------|---------------------|
+| Aider | [docs/tools/aider/README.md](docs/tools/aider/README.md) | Repository Map, LiteLLM multi-provider | 10 categories: Config files, 140+ CLI flags, Model settings, Edit formats, Git, Lint/Test, Voice, Browser, Watch mode |
 | Codex | [docs/tools/codex/README.md](docs/tools/codex/README.md) | Rust TUI, channels, typed protocols | 10 categories: Skills, Starlark rules, Config, Providers, Profiles, MCP, Approvals |
 | Claude Code | [docs/tools/claude-code/README.md](docs/tools/claude-code/README.md) | MCP integration, subagent delegation | 7 categories: MCP (5 scopes), Skills, 11 Hooks, Permissions, Subagents |
 | OpenCode | [docs/tools/opencode/README.md](docs/tools/opencode/README.md) | Multi-provider, session forking | 12 categories: 26 Plugin hooks, Tools, Agents, 18+ Providers, MCP+ACP |
@@ -76,7 +78,7 @@ Sources:
 ### 1. Thin Orchestrator Pattern (Critical)
 
 Keep orchestrators thin (30-40% context), spawn subagents with fresh 200k context.
-Sources: Kata, Get-Shit-Done, Oh-My-OpenCode
+Sources: Kata, Get-Shit-Done, Oh-My-OpenCode, Aider (Architect mode)
 
 ### 2. Category-Based Delegation
 
@@ -109,6 +111,7 @@ Source: Kimi K2
 
 | Tool | Max Agents | Coordination |
 |------|------------|--------------|
+| Aider | 2 | Architect/Editor |
 | Codex | 1 | N/A |
 | Claude Code | 1 + subagents | Task delegation |
 | OpenCode | 2 | Plan/Build tabs |
@@ -120,6 +123,7 @@ Source: Kimi K2
 
 | Tool | Anthropic | OpenAI | Google | Local |
 |------|-----------|--------|--------|-------|
+| Aider | ✅ | ✅ | ✅ | ✅ (50+ via LiteLLM) |
 | Codex | - | ✅ | - | - |
 | Claude Code | ✅ | - | - | - |
 | OpenCode | ✅ | ✅ | ✅ | ✅ |
@@ -192,7 +196,7 @@ ai-agent-study-guide/
 
 ## Key Facts
 
-1. This repository documents 7 AI coding agent implementations
+1. This repository documents **8 AI coding agent implementations** (Aider, Codex, Claude Code, OpenCode, Kata, Get-Shit-Done, Oh-My-OpenCode, Kimi K2)
 2. Best practices synthesized from all tools in BEST-PRACTICES.md
 3. Multi-provider harness architecture in UNIFIED-HARNESS.md
 4. Each tool has consistent README with diagrams
