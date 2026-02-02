@@ -1,0 +1,30 @@
+# CODEOWNERS - AI Agent Study Guide
+# https://docs.github.com/en/repositories/managing-your-repositorys-settings-and-features/customizing-your-repository/about-code-owners
+
+# Default owner for everything
+* @ray-manaloto
+
+# Core AI configuration files
+AGENTS.md @ray-manaloto
+CLAUDE.md @ray-manaloto
+.cursorrules @ray-manaloto
+llms.txt @ray-manaloto
+llms-full.txt @ray-manaloto
+
+# Architecture documentation
+ARCHITECTURE.md @ray-manaloto
+IMPLEMENTATION.md @ray-manaloto
+TOOLING.md @ray-manaloto
+
+# Documentation directory
+/docs/ @ray-manaloto
+
+# Agent guides
+/.opencode/agent/ @ray-manaloto
+/.agents/ @ray-manaloto
+
+# GitHub configuration
+/.github/ @ray-manaloto
+
+# Templates
+/docs/templates/ @ray-manaloto
