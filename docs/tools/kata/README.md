@@ -129,7 +129,19 @@ flowchart TB
     UAT --> Rev
     Rev --> Done
     Done -->|Next Milestone| Mile
+
+    click Q "#artifact-system" "View artifact system"
+    click V "#artifact-system" "Project vision documentation"
+    click R "#multi-agent-orchestration" "Research agents"
+    click Plans "#xml-prompt-formatting" "XML plan structure"
+    click Verify "#orchestration-patterns" "Verification loop"
+    click Wave "#orchestration-patterns" "Wave execution pattern"
+    click Atomic "#git-integration" "Atomic commits"
+    click Debug "#multi-agent-orchestration" "Debug agents"
+    click Six "#multi-agent-orchestration" "PR review swarm"
 ```
+
+> **Interactive**: Click on diagram nodes to jump to detailed sections (requires Mermaid v10+ with `securityLevel: 'loose'`)
 
 ### Phase Details
 
@@ -357,6 +369,259 @@ hij789k feat(08-02): implement password hashing
 | GitHub-integrated workflows | **Recommended** |
 | Quick ad-hoc tasks | Use `/kata:quick` |
 | Simple single-agent tasks | Use vanilla Claude Code |
+
+---
+
+## Customization Points
+
+Kata provides **7 major customization categories** for extending its spec-driven multi-agent orchestration.
+
+### Summary Table
+
+| Category | Location | Description |
+|----------|----------|-------------|
+| **Phase System** | 8 phases | Customize workflow stages (init, plan, execute, verify, review) |
+| **Workflow Config** | `.planning/config.json` | Mode, depth, parallelization, model profiles |
+| **Agent Configuration** | Skills directory | 19+ agent types with fresh 200k context |
+| **XML Templates** | Plan files | Structured task definitions with verification |
+| **Context Management** | `.planning/` directory | Artifacts, research, state persistence |
+| **Git Integration** | Atomic commits | Conventional commits, branch strategies |
+| **Spec Format** | PROJECT.md, REQUIREMENTS.md | Vision capture, requirement IDs |
+
+### 1. Phase System Configuration
+
+Kata's 8-phase workflow is fully customizable:
+
+| Phase | Command | Customization Options |
+|-------|---------|----------------------|
+| 1. Initialize | `/kata:new-project` | Question depth, vision format |
+| 2. Milestone | `/kata:add-milestone` | Scope, requirements structure |
+| 3. Discuss | `/kata:discuss` | Decision capture format |
+| 4. Plan | `/kata:plan-phase N` | Research depth, plan structure |
+| 5. Execute | `/kata:execute-phase N` | Wave parallelization, commit strategy |
+| 6. Verify | `/kata:verify-work N` | Verification criteria, debug depth |
+| 7. Review | `/kata:review-pr` | Review agents selection (6 types) |
+| 8. Complete | `/kata:complete-milestone` | Archive strategy, release notes |
+
+**Skip/Modify Phases:**
+- Use `/kata:quick` for simple tasks (skips full workflow)
+- Phases 3, 6, 7 are optional
+- Configure phase behavior in `config.json`
+
+### 2. Workflow Configuration
+
+**Location:** `.planning/config.json`
+
+```json
+{
+  "mode": "spec-driven",
+  "research_depth": "deep",
+  "parallelization": {
+    "max_parallel_agents": 4,
+    "wave_timeout_minutes": 30
+  },
+  "model_profile": "balanced",
+  "verification": {
+    "max_iterations": 3,
+    "auto_debug": true
+  },
+  "git": {
+    "atomic_commits": true,
+    "conventional_commits": true,
+    "auto_branch": true
+  }
+}
+```
+
+**Model Profiles:**
+| Profile | Planning | Execution | Verification |
+|---------|----------|-----------|--------------|
+| `quality` | Opus | Opus | Sonnet |
+| `balanced` | Opus | Sonnet | Sonnet |
+| `budget` | Sonnet | Sonnet | Haiku |
+
+### 3. Agent Configuration
+
+Kata spawns specialized agents with fresh 200k context windows:
+
+| Agent Type | Role | Customization |
+|------------|------|---------------|
+| `kata-project-researcher` | Domain research | Research scope, sources |
+| `kata-phase-researcher` | Phase-specific research | Focus areas |
+| `kata-planner` | Creates plans | Plan template, task structure |
+| `kata-plan-checker` | Validates plans | Validation rules, iteration limit |
+| `kata-executor` | Implements tasks | Commit style, verification |
+| `kata-verifier` | Confirms deliverables | Success criteria |
+| `kata-debugger` | Fixes failures | Debug strategy |
+| `kata-code-reviewer` | Code quality | Review focus |
+| `kata-test-analyzer` | Test coverage | Coverage thresholds |
+| `kata-failure-finder` | Error handling | Error categories |
+| `kata-type-analyzer` | Type design | Type strictness |
+| `kata-code-simplifier` | Maintainability | Complexity thresholds |
+| `kata-comment-analyzer` | Documentation | Comment standards |
+
+### 4. XML Template System
+
+Kata uses XML for precise, anti-drift task definitions:
+
+**Plan Template:**
+```xml
+<plan phase="01" name="authentication">
+  <task id="01-01-01">
+    <description>Implement user registration endpoint</description>
+    <files>
+      <file>src/auth/register.ts</file>
+      <file>src/auth/register.test.ts</file>
+    </files>
+    <verification>
+      <criterion>POST /auth/register returns 201 for valid input</criterion>
+      <criterion>Returns 400 for invalid email format</criterion>
+    </verification>
+    <depends_on></depends_on>
+  </task>
+  
+  <task id="01-01-02">
+    <description>Add email confirmation flow</description>
+    <verification>
+      <criterion>User receives confirmation email</criterion>
+      <criterion>Clicking link activates account</criterion>
+    </verification>
+    <depends_on>01-01-01</depends_on>
+  </task>
+</plan>
+```
+
+**Custom XML Tags:**
+| Tag | Purpose |
+|-----|---------|
+| `<plan>` | Container with phase and name |
+| `<task>` | Individual work unit with ID |
+| `<description>` | What to implement |
+| `<files>` | Target files |
+| `<verification>` | Success criteria |
+| `<depends_on>` | Task dependencies |
+| `<notes>` | Additional context |
+
+### 5. Context Management
+
+**Artifact Directory Structure:**
+```
+.planning/
+├── PROJECT.md              # Vision (always loaded)
+├── REQUIREMENTS.md         # Scoped requirements with IDs
+├── ROADMAP.md              # Phase structure
+├── STATE.md                # Living session memory
+├── config.json             # Workflow preferences
+├── research/               # Domain research artifacts
+│   ├── stack.md
+│   ├── architecture.md
+│   └── pitfalls.md
+├── {phase}-CONTEXT.md      # Implementation vision per phase
+├── {phase}-RESEARCH.md     # Phase-specific research
+├── {phase}-{N}-PLAN.md     # Executable task plans
+├── {phase}-{N}-SUMMARY.md  # Execution summaries
+├── {phase}-VERIFICATION.md # Automated verification results
+└── {phase}-UAT.md          # User acceptance results
+```
+
+**Context Loading Rules:**
+| File | When Loaded | Purpose |
+|------|-------------|---------|
+| `PROJECT.md` | Always | Core vision anchor |
+| `REQUIREMENTS.md` | Planning + Execution | Traceability |
+| `STATE.md` | Always | Living memory |
+| `{phase}-CONTEXT.md` | Phase execution | Implementation decisions |
+| `{phase}-PLAN.md` | Execution only | Current tasks |
+
+### 6. Git Integration
+
+**Commit Configuration:**
+```json
+{
+  "git": {
+    "atomic_commits": true,
+    "conventional_commits": true,
+    "commit_types": ["feat", "fix", "test", "refactor", "docs", "chore"],
+    "scope_format": "phase-task",
+    "auto_branch": true,
+    "branch_pattern": "kata/{milestone}-{phase}"
+  }
+}
+```
+
+**Commit Format:**
+```bash
+# Conventional commit with phase-task scope
+feat(08-02): implement email confirmation flow
+
+- Add confirmation token generation
+- Create email template
+- Add verification endpoint
+
+Closes #123
+```
+
+**Branch Strategy:**
+| Branch | Purpose |
+|--------|---------|
+| `main` | Production |
+| `kata/{milestone}` | Milestone work |
+| `kata/{milestone}-{phase}` | Phase work |
+
+### 7. Spec Format Customization
+
+**PROJECT.md Template:**
+```markdown
+# Project Vision
+
+## Overview
+[High-level description]
+
+## Goals
+- [ ] Goal 1
+- [ ] Goal 2
+
+## Non-Goals
+- Explicitly out of scope
+
+## Technical Constraints
+- Language: TypeScript
+- Framework: Next.js
+- Database: PostgreSQL
+
+## Success Criteria
+- Measurable outcomes
+```
+
+**REQUIREMENTS.md Template:**
+```markdown
+# Requirements
+
+## V1 Scope
+| ID | Requirement | Priority | Status |
+|----|-------------|----------|--------|
+| R-001 | User registration | Must | Pending |
+| R-002 | Email verification | Must | Pending |
+| R-003 | Password reset | Should | Pending |
+
+## V2 Scope (Future)
+| ID | Requirement | Priority |
+|----|-------------|----------|
+| R-010 | OAuth integration | Must |
+```
+
+### Quick Reference
+
+| What to Customize | Where |
+|-------------------|-------|
+| Workflow behavior | `.planning/config.json` |
+| Model selection | `config.json` → `model_profile` |
+| Agent behavior | Skill files |
+| Task structure | XML plan templates |
+| Git strategy | `config.json` → `git` |
+| Research depth | `config.json` → `research_depth` |
+| Verification rules | `config.json` → `verification` |
+| Context files | `.planning/` directory |
 
 ---
 

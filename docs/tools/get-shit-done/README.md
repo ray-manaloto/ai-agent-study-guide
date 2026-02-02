@@ -381,6 +381,163 @@ npx get-shit-done-cc --all --global
 
 ---
 
+## Customization Points
+
+Based on comprehensive analysis, GSD provides **5 major customization categories**:
+
+### 1. Context Engineering
+
+#### Phase Context (CONTEXT.md)
+
+Capture implementation decisions before planning:
+
+```markdown
+<decisions>
+## Implementation Decisions
+
+### Layout Approach
+- Card-based grid (not timeline)
+- Infinite scroll (not pagination)
+
+### Claude's Discretion
+Areas where user said "you decide"
+</decisions>
+```
+
+**Command**: `/gsd:discuss-phase N` captures your vision before planning.
+
+#### Project Context Files
+
+| File | Purpose | Loaded |
+|------|---------|--------|
+| `PROJECT.md` | Project vision | Always |
+| `STATE.md` | Living memory, decisions, blockers | Per-session |
+| `REQUIREMENTS.md` | Scoped v1/v2 requirements | On demand |
+| `research/` | Domain research findings | On demand |
+| `{phase}-CONTEXT.md` | User's implementation vision | Per-phase |
+
+#### Codebase Context
+
+Run `/gsd:map-codebase` to analyze existing codebases:
+- `CONVENTIONS.md` - Coding patterns
+- `STRUCTURE.md` - File organization
+- `ARCHITECTURE.md` - System design
+- `STACK.md` - Technology choices
+
+### 2. Workflow Configuration
+
+**Location**: `.planning/config.json`
+
+```json
+{
+  "mode": "yolo",           // "yolo" | "interactive"
+  "depth": "standard",      // "quick" | "standard" | "comprehensive"
+  "parallelization": true,
+  "workflow": {
+    "research": true,       // Toggle research phase
+    "plan_check": true,     // Toggle plan verification
+    "verifier": true        // Toggle execution verification
+  },
+  "git": {
+    "branching_strategy": "phase",  // "none" | "phase" | "milestone"
+    "phase_branch_template": "gsd/phase-{phase}-{slug}"
+  }
+}
+```
+
+**Configure via**: `/gsd:settings`
+
+**Per-command overrides**:
+```bash
+/gsd:plan-phase --skip-research
+/gsd:plan-phase --skip-verify
+```
+
+### 3. Model Profiles
+
+| Profile | Planning | Execution | Verification |
+|---------|----------|-----------|--------------|
+| `quality` | Opus | Opus | Sonnet |
+| `balanced` | Opus | Sonnet | Sonnet |
+| `budget` | Sonnet | Sonnet | Haiku |
+
+**Set profile**: `/gsd:set-profile quality`
+
+### 4. Task Decomposition
+
+#### Task Types
+
+```xml
+<task type="auto">                        <!-- Fully autonomous -->
+<task type="checkpoint:human-verify">     <!-- User verification -->
+<task type="checkpoint:decision">         <!-- User choice needed -->
+<task type="checkpoint:human-action">     <!-- Manual action (rare) -->
+```
+
+#### Scope Settings
+
+| Depth | Plans/Phase | Tasks/Plan |
+|-------|-------------|------------|
+| Quick | 1-3 | 2-3 |
+| Standard | 3-5 | 2-3 |
+| Comprehensive | 5-10 | 2-3 |
+
+#### TDD Integration
+
+```yaml
+---
+type: tdd  # Dedicated TDD plan
+---
+```
+
+### 5. Agent Configuration
+
+#### Agent Frontmatter
+
+```yaml
+---
+name: gsd-planner
+description: Creates executable phase plans
+tools: Read, Write, Bash, Glob, Grep, WebFetch, mcp__context7__*
+color: green
+---
+```
+
+#### Available Agents (11)
+
+| Agent | Role | Tools |
+|-------|------|-------|
+| `gsd-planner` | Creates plans | Read, Write, Bash, WebFetch, Context7 |
+| `gsd-executor` | Implements tasks | Read, Write, Edit, Bash, Grep, Glob |
+| `gsd-verifier` | Confirms deliverables | Read, Bash, Grep, Glob |
+| `gsd-debugger` | Systematic debugging | Read, Write, Edit, Bash, Grep, Glob |
+| `gsd-phase-researcher` | Implementation research | WebFetch, Context7 |
+| `gsd-project-researcher` | Domain research (4 parallel) | WebFetch, Context7 |
+| `gsd-codebase-mapper` | Analyzes existing code | Read, Bash, Grep, Glob |
+
+#### Deviation Rules
+
+The executor handles deviations automatically:
+- **RULE 1**: Auto-fix bugs immediately
+- **RULE 2**: Auto-add missing critical functionality
+- **RULE 3**: Auto-fix blocking issues
+- **RULE 4**: Ask about architectural changes (STOP)
+
+### Customization Summary
+
+| Point | Method | Location |
+|-------|--------|----------|
+| Phase Context | CONTEXT.md | `.planning/{phase}-CONTEXT.md` |
+| Project Context | Markdown files | `.planning/PROJECT.md`, `STATE.md` |
+| Workflow | JSON config | `.planning/config.json` |
+| Model Profile | Command | `/gsd:set-profile` |
+| Task Types | XML attributes | `type="checkpoint:*"` |
+| Agents | Markdown frontmatter | `agents/*.md` |
+| Git Strategy | JSON config | `git.branching_strategy` |
+| Templates | Markdown files | `templates/*.md` |
+
+---
+
 ## Resources
 
 | Resource | URL |

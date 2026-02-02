@@ -10,7 +10,7 @@ This document defines a unified harness architecture synthesized from 7 producti
 
 - **Multi-provider support**: Anthropic, OpenAI, Google, Local models
 - **Multi-agent orchestration**: Hierarchical, mesh, and swarm topologies
-- **Generic event loop**: Provider-agnostic message handling
+- **Agent loop**: Provider-agnostic reasoning and tool execution cycle
 - **Tool registry**: Extensible tool system
 - **Session management**: Persistence and forking
 
@@ -304,12 +304,16 @@ interface Session {
 
 ---
 
-## Event Loop
+## Agent Loop
 
-### Generic Event Loop Pattern
+### Agent Execution Loop
+
+The agent loop is the core execution cycle where the agent perceives input, reasons about it, acts via tools, and observes results. This is distinct from traditional "event loops" (like Node.js's libuv or Python's asyncio) which handle I/O multiplexing.
+
+> **Terminology Note**: Industry-standard terminology from OpenAI, Anthropic, and academic literature uses "Agent Loop" or "Agentic Loop" for this pattern. "Event Loop" refers specifically to async I/O polling in traditional programming.
 
 ```typescript
-class EventLoop {
+class AgentLoop {
   private providers: Map<string, Provider>;
   private tools: ToolRegistry;
   private orchestrator: Orchestrator;
@@ -426,12 +430,12 @@ class EventLoop {
 }
 ```
 
-### Event Loop Sequence Diagram
+### Agent Loop Sequence Diagram
 
 ```mermaid
 sequenceDiagram
     participant U as User/UI
-    participant L as Event Loop
+    participant L as Agent Loop
     participant P as Provider
     participant T as Tool Registry
     participant A as Approval Queue
@@ -995,76 +999,993 @@ limits:
 
 ---
 
-## Extension Points
+## Extension Points (Comprehensive)
 
-### Custom Provider
+This section documents **12 customization categories** synthesized from 7 production implementations.
+
+### Customization Matrix (Detailed)
+
+| Category | Codex | Claude Code | OpenCode | Oh-My-OpenCode | Kata | GSD | Kimi K2 |
+|----------|-------|-------------|----------|----------------|------|-----|---------|
+| **Hooks** | Events + Notify | 11 lifecycle | 26 hooks | 31 hooks | Statusline | Statusline | - |
+| **Tools** | 15+ built-in | 20+ MCP | 25+ MCP+ACP | 30+ Custom | Skill-embedded | Skill-embedded | API register |
+| **Skills** | Skills dirs | Skills+Commands | Skills dirs | Skills+Triggers | 27 skills | Commands | - |
+| **Slash Commands** | - | /skill-name | - | 37+ commands | /kata:* | /gsd:* | - |
+| **Plugins** | - | MCP servers | Full plugins | Full plugins | - | - | - |
+| **MCP/ACP** | MCP support | MCP + OAuth | MCP+ACP+OAuth | MCP | - | - | - |
+| **Providers** | OpenAI+Custom | Anthropic | 18+ AI SDK | 20+ | Claude | Multi-runtime | Moonshot |
+| **Agents** | Single | Subagents | Primary+Sub | 10+ specialized | 19+ | 11 | 100 swarm |
+| **Config** | TOML+Profiles | settings.json | JSON/JSONC | JSON+YAML | config.json | config.json | API params |
+| **Approvals** | Starlark rules | Permissions | Glob policies | Rules | Auto | Auto | - |
+| **Workflows** | - | - | - | Ralph/Ultra | 8 phases | 6 steps | PARL |
+| **Memory** | Session | Ephemeral | Persist | Notepads | Artifacts | STATE.md | Context |
+
+### Customization Detail Summary
+
+| Framework | Primary Extension Method | Key Customization Files |
+|-----------|--------------------------|-------------------------|
+| **Codex** | Skills + Rules + Profiles | `~/.codex/config.toml`, `~/.codex/skills/*/SKILL.md`, `~/.codex/rules/*.rules` |
+| **Claude Code** | MCP + Skills + Hooks | `~/.claude/settings.json`, `.mcp.json`, `.claude/skills/*/SKILL.md` |
+| **OpenCode** | Plugins + Hooks (26 types) | `opencode.json`, `.opencode/plugins/`, `.opencode/tools/` |
+| **Oh-My-OpenCode** | Hooks (31) + Skills + Categories | `.omc/skills/`, `.claude/settings.json`, agent definitions |
+| **Kata** | XML Templates + Phases + Skills | `.planning/config.json`, agents/*.md, CONTEXT.md |
+| **GSD** | Context Files + Model Profiles | `.planning/`, STATE.md, config.json |
+| **Kimi K2** | API Parameters + PARL Config | API: temp, top_p, max_tokens, swarm config |
+
+---
+
+### 1. Hooks System
+
+**Sources**: Codex (events), Claude Code (settings.json), Oh-My-OpenCode (32+ hooks)
+
+#### Hook Categories
+
+| Category | Hooks | Purpose |
+|----------|-------|---------|
+| **Lifecycle** | session-start, session-end | Setup/teardown |
+| **Message** | chat.message, messages.transform | Input/output transformation |
+| **Tool** | tool.execute.before, tool.execute.after | Intercept tool calls |
+| **Edit** | pre-edit, post-edit | File modification control |
+| **Command** | pre-command, post-command | Shell execution control |
+| **Task** | pre-task, post-task | Task lifecycle |
+| **Learning** | on-success, on-failure | Pattern extraction |
+| **Context** | context-inject, compaction | Context management |
+
+#### Hook Interface
+
+```typescript
+interface HookSystem {
+  // Registration
+  register(hook: Hook): void;
+  unregister(hookId: string): void;
+  
+  // Execution
+  trigger(event: string, context: HookContext): Promise<HookResult>;
+  
+  // Discovery
+  list(category?: string): Hook[];
+}
+
+interface Hook {
+  id: string;
+  event: string;           // e.g., "pre-edit", "tool.execute.before"
+  priority: number;        // Execution order (lower = first)
+  handler: HookHandler;
+  enabled: boolean;
+}
+
+type HookHandler = (context: HookContext) => Promise<HookResult>;
+
+interface HookContext {
+  event: string;
+  data: unknown;           // Event-specific data
+  session: Session;
+  cancel?: () => void;     // Cancel the operation
+  modify?: (data: unknown) => void;  // Modify the data
+}
+
+interface HookResult {
+  continue: boolean;       // Whether to continue execution
+  data?: unknown;          // Modified data
+  error?: Error;
+}
+```
+
+#### Hook Configuration (Oh-My-OpenCode Style)
+
+```json
+// .opencode/hooks.json or ~/.claude/settings.json
+{
+  "hooks": {
+    "pre-edit": [
+      {
+        "id": "format-check",
+        "command": "prettier --check",
+        "enabled": true
+      }
+    ],
+    "post-edit": [
+      {
+        "id": "auto-format",
+        "command": "prettier --write",
+        "enabled": true
+      }
+    ],
+    "chat.message": [
+      {
+        "id": "keyword-detector",
+        "type": "builtin",
+        "config": {
+          "keywords": ["ultrawork", "analyze", "search"]
+        }
+      }
+    ]
+  }
+}
+```
+
+#### Built-in Hook Examples
+
+| Hook | Tool | Purpose |
+|------|------|---------|
+| `directory-agents-injector` | Oh-My-OpenCode | Auto-injects AGENTS.md |
+| `rules-injector` | Oh-My-OpenCode | Injects .claude/rules/ |
+| `keyword-detector` | Oh-My-OpenCode | Detects trigger words |
+| `todo-continuation-enforcer` | Oh-My-OpenCode | Forces task completion |
+| `edit-error-recovery` | Oh-My-OpenCode | Recovers from edit failures |
+| `think-mode` | Oh-My-OpenCode | Auto-detects extended thinking |
+
+---
+
+### 2. Tools System
+
+**Sources**: All tools
+
+#### Tool Interface
+
+```typescript
+interface Tool {
+  // Identity
+  name: string;
+  description: string;
+  category: ToolCategory;
+  
+  // Schema (JSON Schema)
+  parameters: JSONSchema;
+  returns: JSONSchema;
+  
+  // Execution
+  execute(args: unknown, context: ToolContext): Promise<ToolResult>;
+  
+  // Safety
+  riskLevel: "low" | "medium" | "high" | "critical";
+  requiresApproval: boolean;
+  validate?(args: unknown): ValidationResult;
+}
+
+type ToolCategory =
+  | "filesystem"      // read, write, edit, glob, grep
+  | "shell"           // bash, terminal
+  | "web"             // fetch, browser, search
+  | "code_analysis"   // lsp, ast, symbols
+  | "git"             // status, diff, commit
+  | "mcp"             // MCP server tools
+  | "delegation"      // Task, subagent spawning
+  | "memory"          // Store, retrieve, search
+  | "custom";         // User-defined
+```
+
+#### Tool Registration
+
+```typescript
+// Built-in registration
+harness.tools.register({
+  name: "custom_search",
+  description: "Search using custom index",
+  category: "custom",
+  riskLevel: "low",
+  requiresApproval: false,
+  parameters: {
+    type: "object",
+    properties: {
+      query: { type: "string" },
+      limit: { type: "number", default: 10 }
+    },
+    required: ["query"]
+  },
+  execute: async (args, ctx) => {
+    const results = await customIndex.search(args.query, args.limit);
+    return { results };
+  }
+});
+
+// MCP-based registration (Claude Code, OpenCode)
+// Tools automatically discovered from MCP servers
+```
+
+#### Tool Categories by Framework
+
+| Framework | Built-in Tools | Extension Method |
+|-----------|---------------|------------------|
+| Codex | 15+ | Protocol extension |
+| Claude Code | 20+ | MCP servers |
+| OpenCode | 25+ | MCP + ACP |
+| Oh-My-OpenCode | 30+ | Custom + MCP |
+| Kata | 10+ | Skill-embedded |
+| GSD | 10+ | Skill-embedded |
+| Kimi K2 | API-based | Tool registration API |
+
+---
+
+### 3. Skills System
+
+**Sources**: Claude Code, Oh-My-OpenCode, Kata, GSD
+
+#### Skill Definition
+
+```yaml
+# ~/.opencode/skills/frontend-ui-ux/SKILL.md
+# Or: ~/.claude/commands/frontend-ui-ux.md
+---
+name: frontend-ui-ux
+description: Designer-turned-developer who crafts stunning UI/UX
+triggers:
+  - "UI component"
+  - "responsive design"
+  - "animation"
+  - "styling"
+mcp:
+  playwright:
+    command: npx
+    args: ["-y", "@anthropic-ai/mcp-playwright"]
+---
+
+# Frontend UI/UX Skill
+
+You are a designer-turned-developer who creates beautiful, accessible interfaces.
+
+## Core Principles
+1. Mobile-first responsive design
+2. WCAG 2.1 AA accessibility
+3. Performance budgets (LCP < 2.5s)
+4. Design system adherence
+
+## When creating components:
+- Use semantic HTML
+- Implement keyboard navigation
+- Add ARIA labels where needed
+- Test with screen readers
+```
+
+#### Skill Loading Locations
+
+| Location | Scope | Tool |
+|----------|-------|------|
+| `.opencode/skills/*/SKILL.md` | Project | OpenCode, Oh-My-OpenCode |
+| `~/.config/opencode/skills/*/SKILL.md` | User | OpenCode, Oh-My-OpenCode |
+| `.claude/commands/*.md` | Project | Claude Code |
+| `~/.claude/commands/*.md` | User | Claude Code |
+| `.kata/skills/*.md` | Project | Kata |
+
+#### Skill Interface
+
+```typescript
+interface Skill {
+  // Metadata (from YAML frontmatter)
+  name: string;
+  description: string;
+  triggers?: string[];       // Keywords that activate skill
+  
+  // Dependencies
+  mcp?: Record<string, MCPServerConfig>;  // Embedded MCP servers
+  tools?: string[];          // Required tools
+  
+  // Content
+  instructions: string;      // Markdown body (loaded on-demand)
+  
+  // Loading
+  loaded: boolean;           // Lazy loading flag
+}
+
+interface SkillRegistry {
+  // Discovery
+  discover(): Skill[];       // Find all skills in paths
+  
+  // Loading
+  load(name: string): Promise<Skill>;  // Lazy load skill
+  
+  // Matching
+  match(prompt: string): Skill[];      // Find relevant skills
+  
+  // Injection
+  inject(skill: Skill, context: Context): Context;
+}
+```
+
+---
+
+### 4. Slash Commands
+
+**Sources**: Claude Code, Oh-My-OpenCode, Kata, GSD
+
+#### Command Types
+
+| Type | Example | Description |
+|------|---------|-------------|
+| **Built-in** | `/help`, `/clear` | Core functionality |
+| **Skill** | `/frontend-ui-ux` | Loads a skill |
+| **Workflow** | `/kata:plan-phase 3` | Executes workflow step |
+| **Custom** | `/my-command` | User-defined |
+
+#### Command Interface
+
+```typescript
+interface SlashCommand {
+  name: string;              // e.g., "kata:plan-phase"
+  description: string;
+  usage: string;             // e.g., "/kata:plan-phase <phase-number>"
+  
+  // Execution
+  execute(args: string[], context: CommandContext): Promise<CommandResult>;
+  
+  // Validation
+  validate?(args: string[]): ValidationResult;
+  
+  // Autocomplete
+  complete?(partial: string): string[];
+}
+
+interface CommandRegistry {
+  register(command: SlashCommand): void;
+  execute(input: string): Promise<CommandResult>;
+  list(): SlashCommand[];
+  search(query: string): SlashCommand[];
+}
+```
+
+#### Framework-Specific Commands
+
+| Framework | Commands | Pattern |
+|-----------|----------|---------|
+| Claude Code | `/help`, `/clear`, `/config`, `/skill-name` | `/command` |
+| Oh-My-OpenCode | `/ralph-loop`, `/ulw-loop`, `/refactor`, `/init-deep` | `/command` |
+| Kata | `/kata:new-project`, `/kata:plan-phase N`, `/kata:execute-phase N` | `/kata:action` |
+| GSD | `/gsd:new-project`, `/gsd:plan-phase N`, `/gsd:execute-phase N` | `/gsd:action` |
+
+---
+
+### 5. Plugin Architecture
+
+**Sources**: Oh-My-OpenCode, OpenCode (partial)
+
+#### Plugin Interface
+
+```typescript
+interface Plugin {
+  // Metadata
+  name: string;
+  version: string;
+  description: string;
+  author: string;
+  
+  // Lifecycle
+  activate(context: PluginContext): Promise<void>;
+  deactivate(): Promise<void>;
+  
+  // Contributions
+  contributes: {
+    hooks?: Hook[];
+    tools?: Tool[];
+    skills?: Skill[];
+    commands?: SlashCommand[];
+    providers?: Provider[];
+    agents?: AgentDefinition[];
+  };
+}
+
+interface PluginContext {
+  // Access to harness systems
+  hooks: HookSystem;
+  tools: ToolRegistry;
+  skills: SkillRegistry;
+  commands: CommandRegistry;
+  memory: MemoryStore;
+  
+  // Plugin-specific storage
+  storage: PluginStorage;
+  
+  // Logging
+  logger: Logger;
+}
+```
+
+#### Plugin Configuration
+
+```json
+// .opencode/plugins.json
+{
+  "plugins": [
+    {
+      "name": "@omc/visual-engineering",
+      "enabled": true,
+      "config": {
+        "defaultFramework": "react",
+        "cssFramework": "tailwind"
+      }
+    },
+    {
+      "name": "local:./plugins/custom-plugin",
+      "enabled": true
+    }
+  ]
+}
+```
+
+---
+
+### 6. MCP/ACP Integration
+
+**Sources**: Claude Code, OpenCode, Oh-My-OpenCode
+
+#### MCP Server Configuration
+
+```json
+// .mcp.json or ~/.claude/settings.json
+{
+  "mcpServers": {
+    "filesystem": {
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-filesystem"],
+      "env": {
+        "ALLOWED_DIRECTORIES": "/home/user/projects"
+      }
+    },
+    "github": {
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-github"],
+      "env": {
+        "GITHUB_TOKEN": "${GITHUB_TOKEN}"
+      }
+    },
+    "custom-api": {
+      "transport": "http",
+      "url": "http://localhost:3001/mcp"
+    }
+  }
+}
+```
+
+#### MCP Interface
+
+```typescript
+interface MCPServer {
+  name: string;
+  transport: "stdio" | "http" | "sse";
+  
+  // Connection
+  connect(): Promise<void>;
+  disconnect(): Promise<void>;
+  
+  // Tool discovery
+  listTools(): Promise<MCPTool[]>;
+  
+  // Tool execution
+  callTool(name: string, args: unknown): Promise<MCPResult>;
+  
+  // Resources (optional)
+  listResources?(): Promise<MCPResource[]>;
+  readResource?(uri: string): Promise<MCPContent>;
+}
+
+interface MCPManager {
+  // Server management
+  add(name: string, config: MCPServerConfig): Promise<void>;
+  remove(name: string): Promise<void>;
+  list(): MCPServer[];
+  
+  // Tool aggregation
+  getAllTools(): MCPTool[];
+  callTool(serverName: string, toolName: string, args: unknown): Promise<MCPResult>;
+}
+```
+
+#### ACP (Agent Client Protocol) - OpenCode
+
+```typescript
+// ACP extends MCP for agent-to-agent communication
+interface ACPAgent {
+  // Identity
+  id: string;
+  capabilities: string[];
+  
+  // Communication
+  send(message: ACPMessage): Promise<ACPResponse>;
+  subscribe(event: string, handler: ACPHandler): void;
+  
+  // Delegation
+  delegate(task: Task): Promise<TaskResult>;
+}
+```
+
+---
+
+### 7. Provider System
+
+**Sources**: OpenCode, Oh-My-OpenCode
+
+#### Provider Interface
+
+```typescript
+interface Provider {
+  // Identity
+  readonly name: string;
+  readonly models: Model[];
+  
+  // Capabilities
+  readonly capabilities: {
+    streaming: boolean;
+    tools: boolean;
+    vision: boolean;
+    embeddings: boolean;
+    maxContextWindow: number;
+    extendedThinking?: boolean;
+  };
+  
+  // Core operations
+  chat(request: ChatRequest): AsyncIterator<ChatChunk>;
+  embed(text: string | string[]): Promise<Embedding[]>;
+  
+  // Lifecycle
+  initialize(): Promise<void>;
+  shutdown(): Promise<void>;
+  healthCheck(): Promise<HealthStatus>;
+}
+```
+
+#### Supported Providers (OpenCode)
+
+| Provider | Package | Models |
+|----------|---------|--------|
+| Anthropic | `@ai-sdk/anthropic` | Claude Opus, Sonnet, Haiku |
+| OpenAI | `@ai-sdk/openai` | GPT-4o, GPT-5, o1 |
+| Google | `@ai-sdk/google` | Gemini 1.5/2.0 |
+| Azure | `@ai-sdk/azure` | Azure OpenAI |
+| AWS Bedrock | `@ai-sdk/amazon-bedrock` | Claude, Titan |
+| xAI | `@ai-sdk/xai` | Grok |
+| Mistral | `@ai-sdk/mistral` | Mistral Large |
+| Groq | `@ai-sdk/groq` | Llama, Mixtral |
+| Together | `@ai-sdk/togetherai` | Open models |
+| Local | `@ai-sdk/openai-compatible` | Ollama, LMStudio |
+
+#### Custom Provider Registration
 
 ```typescript
 class CustomProvider implements Provider {
-  // Implement the Provider interface
-}
-
-// Register with harness
-harness.registerProvider(new CustomProvider());
-```
-
-### Custom Tool
-
-```typescript
-const customTool: Tool = {
-  name: "my_tool",
-  description: "Does something custom",
-  // ... full tool definition
-};
-
-// Register with harness
-harness.tools.register(customTool);
-```
-
-### Custom Orchestrator
-
-```typescript
-class CustomOrchestrator implements Orchestrator {
-  // Implement custom coordination logic
-}
-
-// Use with harness
-const harness = new AgentHarness({
-  orchestrator: new CustomOrchestrator()
-});
-```
-
-### Hooks System
-
-```typescript
-interface Hooks {
-  // Lifecycle hooks
-  onSessionStart(session: Session): Promise<void>;
-  onSessionEnd(session: Session): Promise<void>;
+  readonly name = "custom";
+  readonly models = [
+    { id: "custom-model", contextWindow: 100_000 }
+  ];
   
-  // Message hooks
-  onBeforeMessage(message: Message): Promise<Message>;
-  onAfterMessage(message: Message, response: Response): Promise<void>;
-  
-  // Tool hooks
-  onBeforeToolCall(tool: Tool, args: unknown): Promise<unknown>;
-  onAfterToolCall(tool: Tool, result: ToolResult): Promise<ToolResult>;
-  
-  // Agent hooks
-  onAgentSpawn(agent: Agent): Promise<void>;
-  onAgentTerminate(agent: Agent): Promise<void>;
-  
-  // Learning hooks
-  onSuccess(task: Task, result: Result): Promise<void>;
-  onFailure(task: Task, error: Error): Promise<void>;
-}
-
-// Register hooks
-harness.hooks.register({
-  onSuccess: async (task, result) => {
-    await wisdom.learn(task, result);
+  async *chat(request: ChatRequest): AsyncIterator<ChatChunk> {
+    const response = await this.client.generate({
+      prompt: this.formatMessages(request.messages),
+      ...request
+    });
+    
+    for await (const chunk of response.stream()) {
+      yield this.convertChunk(chunk);
+    }
   }
-});
+}
+
+// Register
+harness.providers.register(new CustomProvider());
+```
+
+---
+
+### 8. Agent Definitions
+
+**Sources**: Oh-My-OpenCode, Kata, GSD
+
+#### Agent Interface
+
+```typescript
+interface AgentDefinition {
+  // Identity
+  id: string;
+  name: string;
+  description: string;
+  
+  // Model selection
+  model?: {
+    provider: string;
+    modelId: string;
+  };
+  
+  // Behavior
+  systemPrompt: string;
+  temperature?: number;
+  topP?: number;
+  
+  // Restrictions
+  permissions: PermissionRuleset;
+  tools: ToolWhitelist;
+  
+  // Delegation (for orchestrators)
+  canDelegate: boolean;
+  delegationTargets?: string[];  // Agent IDs that can be delegated to
+}
+
+interface AgentRegistry {
+  register(agent: AgentDefinition): void;
+  get(id: string): AgentDefinition | undefined;
+  list(filter?: AgentFilter): AgentDefinition[];
+  spawn(id: string, context?: AgentContext): Promise<Agent>;
+}
+```
+
+#### Agent Configuration (Oh-My-OpenCode Style)
+
+```yaml
+# .opencode/agents/oracle.yaml
+id: oracle
+name: Oracle
+description: High-IQ consultant for architecture and debugging
+model:
+  provider: openai
+  modelId: gpt-5.2
+systemPrompt: |
+  You are Oracle, a read-only consultation agent for:
+  - Architecture decisions
+  - Complex debugging
+  - Security analysis
+  
+  You CANNOT modify files. You provide advice only.
+temperature: 0.7
+permissions:
+  - pattern: "read_file *"
+    action: allow
+  - pattern: "write_file *"
+    action: deny
+  - pattern: "edit_file *"
+    action: deny
+  - pattern: "bash *"
+    action: deny
+canDelegate: false
+```
+
+#### Specialized Agent Examples
+
+| Agent | Framework | Role | Restrictions |
+|-------|-----------|------|--------------|
+| `sisyphus` | Oh-My-OpenCode | Main orchestrator | Full access |
+| `prometheus` | Oh-My-OpenCode | Strategic planner | READ-ONLY |
+| `oracle` | Oh-My-OpenCode | Architecture consultant | READ-ONLY |
+| `sisyphus-junior` | Oh-My-OpenCode | Task executor | Cannot delegate |
+| `kata-planner` | Kata | Creates plans | Standard |
+| `kata-executor` | Kata | Implements tasks | Fresh 200k |
+| `gsd-researcher` | GSD | Domain research | WebFetch, Context7 |
+
+---
+
+### 9. Configuration System
+
+**Sources**: All tools
+
+#### Configuration Hierarchy
+
+```
+Project Config   >  User Config  >  System Config  >  Defaults
+./.opencode/config.json
+                    ~/.config/opencode/config.json
+                                     /etc/opencode/config.json
+                                                      (built-in)
+```
+
+#### Configuration Schema
+
+```typescript
+interface HarnessConfig {
+  // Provider configuration
+  providers: {
+    [name: string]: ProviderConfig;
+  };
+  
+  // Default selections
+  defaultProvider: string;
+  defaultModel: string;
+  
+  // Orchestration
+  orchestration: {
+    topology: Topology;
+    maxAgents: number;
+    strategy: "specialized" | "generalist" | "adaptive";
+  };
+  
+  // Session
+  session: {
+    persistence: "memory" | "file" | "database";
+    storagePath?: string;
+    autoSave: boolean;
+    autoSaveInterval: number;
+  };
+  
+  // Approval
+  approval: {
+    mode: "ask" | "allow" | "deny";
+    defaultPolicies: PolicyAmendment[];
+  };
+  
+  // Tools
+  tools: {
+    enabled: string[];
+    disabled: string[];
+    mcpServers: MCPServerConfig[];
+  };
+  
+  // Hooks
+  hooks: {
+    [event: string]: HookConfig[];
+  };
+  
+  // Limits
+  limits: {
+    maxContextTokens: number;
+    maxOutputTokens: number;
+    maxToolCalls: number;
+    timeout: number;
+  };
+  
+  // Categories (Oh-My-OpenCode)
+  categories?: {
+    [name: string]: CategoryConfig;
+  };
+}
+```
+
+#### Configuration Validation
+
+```typescript
+interface ConfigValidator {
+  validate(config: unknown): ValidationResult;
+  merge(configs: Partial<HarnessConfig>[]): HarnessConfig;
+  watch(path: string, callback: (config: HarnessConfig) => void): void;
+}
+```
+
+---
+
+### 10. Approval Policies
+
+**Sources**: Codex, Claude Code, OpenCode
+
+#### Policy Interface
+
+```typescript
+interface PolicyAmendment {
+  pattern: string;           // Glob pattern, e.g., "rm -rf *"
+  action: "allow" | "deny" | "ask";
+  scope: "session" | "project" | "user" | "permanent";
+  reason?: string;
+  expires?: Date;
+}
+
+interface ApprovalSystem {
+  // Policy management
+  addPolicy(policy: PolicyAmendment): void;
+  removePolicy(pattern: string): void;
+  listPolicies(): PolicyAmendment[];
+  
+  // Decision making
+  check(operation: Operation): ApprovalDecision;
+  
+  // Queue management (Codex style)
+  enqueue(request: ApprovalRequest): void;
+  dequeue(): ApprovalRequest | undefined;
+  current(): ApprovalRequest | undefined;
+}
+
+interface ApprovalRequest {
+  id: string;
+  operation: Operation;
+  risk: RiskLevel;
+  context: string;
+  timestamp: Date;
+}
+```
+
+#### Approval Modes
+
+| Mode | Claude Code | OpenCode | Behavior |
+|------|-------------|----------|----------|
+| `ask` | Default | Default | Always prompt user |
+| `allow` | Auto-accept | - | Auto-approve matching |
+| `deny` | - | - | Auto-reject matching |
+| `trust` | Full autonomy | - | No approvals needed |
+
+#### Policy Configuration
+
+```yaml
+# .opencode/policies.yaml
+policies:
+  # Allow all reads
+  - pattern: "read_file *"
+    action: allow
+    scope: permanent
+    
+  # Ask for writes in src/
+  - pattern: "write_file src/*"
+    action: ask
+    scope: project
+    
+  # Deny dangerous commands
+  - pattern: "rm -rf /"
+    action: deny
+    scope: permanent
+    reason: "Catastrophic data loss"
+    
+  # Session-specific
+  - pattern: "npm install *"
+    action: allow
+    scope: session
+```
+
+---
+
+### 11. Workflow System
+
+**Sources**: Kata, GSD, Oh-My-OpenCode
+
+#### Workflow Interface
+
+```typescript
+interface Workflow {
+  id: string;
+  name: string;
+  description: string;
+  
+  // Phases
+  phases: Phase[];
+  
+  // State
+  currentPhase: number;
+  status: WorkflowStatus;
+  
+  // Artifacts
+  artifactDir: string;
+  
+  // Execution
+  start(): Promise<void>;
+  advance(): Promise<void>;
+  rollback(): Promise<void>;
+}
+
+interface Phase {
+  id: string;
+  name: string;
+  description: string;
+  
+  // Execution
+  command: string;              // Slash command to execute
+  agents: string[];             // Agents involved
+  
+  // Dependencies
+  dependsOn?: string[];         // Phase IDs
+  
+  // Artifacts
+  inputs: string[];             // Required artifacts
+  outputs: string[];            // Produced artifacts
+}
+```
+
+#### Workflow Types
+
+| Type | Framework | Phases | Description |
+|------|-----------|--------|-------------|
+| 8-Phase | Kata | Init, Milestone, Discuss, Plan, Execute, Verify, Review, Complete | Spec-driven |
+| 6-Step | GSD | New-project, Discuss, Plan, Execute, Verify, Complete | Context-engineered |
+| Ralph Loop | Oh-My-OpenCode | Continuous | Self-referential until done |
+| PARL | Kimi K2 | Dynamic | Reinforcement learning |
+
+#### Workflow Configuration
+
+```yaml
+# .planning/config.json or .kata/config.json
+{
+  "workflow": {
+    "type": "8-phase",
+    "parallelExecution": true,
+    "maxConcurrentAgents": 3,
+    "modelProfile": "balanced"
+  },
+  "phases": {
+    "plan": {
+      "verificationLoops": 3,
+      "agents": ["planner", "checker"]
+    },
+    "execute": {
+      "waveExecution": true,
+      "atomicCommits": true
+    }
+  }
+}
+```
+
+---
+
+### 12. Memory & State System
+
+**Sources**: Oh-My-OpenCode, Kata, GSD, OpenCode
+
+#### Memory Interface
+
+```typescript
+interface MemoryStore {
+  // Key-value operations
+  set(key: string, value: unknown, options?: StoreOptions): Promise<void>;
+  get(key: string): Promise<unknown | undefined>;
+  delete(key: string): Promise<void>;
+  
+  // Search (with embeddings)
+  search(query: string, options?: SearchOptions): Promise<SearchResult[]>;
+  
+  // Namespaces
+  namespace(name: string): MemoryStore;
+  
+  // Persistence
+  persist(): Promise<void>;
+  load(): Promise<void>;
+}
+
+interface StoreOptions {
+  namespace?: string;
+  ttl?: number;              // Time to live in seconds
+  tags?: string[];           // For filtering
+  embedding?: boolean;       // Generate embedding for search
+}
+
+interface SearchOptions {
+  namespace?: string;
+  limit?: number;
+  threshold?: number;        // Similarity threshold
+  tags?: string[];
+}
+```
+
+#### Memory Types
+
+| Type | Framework | Purpose | Location |
+|------|-----------|---------|----------|
+| Session | All | Conversation history | Memory |
+| Artifacts | Kata, GSD | Planning documents | `.planning/` |
+| Notepads | Oh-My-OpenCode | Accumulated wisdom | `.sisyphus/notepads/` |
+| STATE.md | GSD | Living memory | `.planning/STATE.md` |
+| Embeddings | Oh-My-OpenCode | Semantic search | `.opencode/memory/` |
+
+#### Wisdom Accumulation (Oh-My-OpenCode)
+
+```typescript
+interface WisdomSystem {
+  // Learning
+  learn(task: Task, result: Result): Promise<void>;
+  
+  // Retrieval
+  recall(context: string): Promise<WisdomEntry[]>;
+  
+  // Persistence
+  export(): Promise<WisdomExport>;
+  import(data: WisdomExport): Promise<void>;
+}
+
+interface WisdomEntry {
+  pattern: string;           // What was learned
+  context: string;           // When it applies
+  confidence: number;        // Reliability (0-1)
+  source: string;            // Where learned
+  timestamp: Date;
+  occurrences: number;       // Times observed
+}
 ```
 
 ---
@@ -1085,7 +2006,7 @@ harness.hooks.register({
 | Message Types | ✅ Defined | Universal protocol |
 | Provider Interface | ✅ Defined | Multi-provider ready |
 | Tool Registry | ✅ Defined | Extensible |
-| Event Loop | ✅ Defined | Generic pattern |
+| Agent Loop | ✅ Defined | Core execution pattern |
 | Orchestrators | ✅ Defined | Multiple topologies |
 | Session Manager | ✅ Defined | Persistence ready |
 | Configuration | ✅ Defined | YAML/JSON support |

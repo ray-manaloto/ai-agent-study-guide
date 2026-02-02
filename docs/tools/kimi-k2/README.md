@@ -327,6 +327,176 @@ kimi-code --video demo.mp4
 
 ---
 
+## Customization Points
+
+Based on comprehensive analysis, Kimi K2 provides **6 major customization categories**:
+
+### 1. PARL Configuration (Training-level)
+
+For researchers fine-tuning or extending Kimi K2:
+
+```
+R_t = λ_aux(e) · r_parallel + (1 - λ_aux(e)) · (I[success] · Q(τ))
+```
+
+| Parameter | Default | Description |
+|-----------|---------|-------------|
+| λ_aux start | 0.1 | Initial parallelism reward weight |
+| λ_aux end | 0.0 | Final value (task success dominates) |
+| r_parallel | Variable | Instantiation reward |
+| Q(τ) | Variable | Task-level outcome quality |
+
+**Customization**: Adjust annealing schedule to balance exploration vs exploitation.
+
+### 2. Agent Swarm Configuration
+
+```python
+# Swarm configuration via API
+swarm_config = {
+    "max_agents": 100,           # 1-100 agents
+    "max_main_steps": 100,       # Orchestrator steps
+    "max_subagent_steps": 100,   # Per-subagent steps
+    "context_strategy": "discard-all"  # Memory management
+}
+```
+
+| Swarm Mode | Max Main Steps | Max Subagent Steps | Use Case |
+|------------|----------------|-------------------|----------|
+| BrowseComp | 15 | 100 | Web browsing |
+| WideSearch | 100 | 100 | Broad search |
+| Custom | Configurable | Configurable | Domain-specific |
+
+### 3. Tool Registration
+
+Register custom tools via API:
+
+```python
+tools = [
+    {
+        "type": "function",
+        "function": {
+            "name": "custom_search",
+            "description": "Search custom database",
+            "parameters": {
+                "type": "object",
+                "properties": {
+                    "query": {"type": "string"},
+                    "limit": {"type": "number"}
+                },
+                "required": ["query"]
+            }
+        }
+    }
+]
+
+response = client.chat.completions.create(
+    model="kimi-k2.5-agent",
+    messages=messages,
+    tools=tools
+)
+```
+
+**Built-in tool categories**: Search, Code interpreter, Web browser, Office productivity, Vision
+
+**Limits**: Up to 1,500 coordinated tool calls per task
+
+### 4. Orchestrator Configuration
+
+```python
+# API parameters for orchestrator tuning
+response = client.chat.completions.create(
+    model="kimi-k2.5-agent-swarm",
+    messages=messages,
+    temperature=1.0,      # 0.0-2.0 (Thinking: 1.0, Instant: 0.6)
+    top_p=0.95,           # 0.0-1.0 nucleus sampling
+    max_tokens=256000,    # Up to 256K context
+    extra_body={
+        "thinking": {"type": "enabled"},  # or "disabled" for Instant
+        "max_steps": 100
+    }
+)
+```
+
+| Parameter | Thinking Mode | Instant Mode |
+|-----------|---------------|--------------|
+| temperature | 1.0 | 0.6 |
+| max_tokens | 96K (reasoning budget) | 64K |
+| thinking | enabled | disabled |
+
+### 5. API Customization
+
+**OpenAI-compatible endpoint**:
+
+```python
+import openai
+
+client = openai.OpenAI(
+    api_key="YOUR_API_KEY",
+    base_url="https://api.moonshot.cn/v1"  # or platform.moonshot.ai
+)
+```
+
+**Model variants**:
+
+| Model | Use Case |
+|-------|----------|
+| `kimi-k2.5` | General multimodal |
+| `kimi-k2.5-thinking` | Complex reasoning (96K thinking budget) |
+| `kimi-k2.5-instant` | Fast responses |
+| `kimi-k2.5-agent` | Single-agent tool use |
+| `kimi-k2.5-agent-swarm` | Multi-agent parallel (Beta) |
+
+**Multimodal input**:
+```python
+messages = [
+    {
+        "role": "user",
+        "content": [
+            {"type": "text", "text": "Analyze this"},
+            {"type": "image_url", "image_url": {"url": "data:image/png;base64,..."}}
+        ]
+    }
+]
+```
+
+### 6. Critical Steps Optimization (GPO)
+
+For fine-tuning with Guided Pivotal Optimization:
+
+```
+1. Generate reasoning trajectory
+2. Identify critical step (highest advantage)
+3. Reset to critical step
+4. Sample new rollouts from that point
+5. Prioritize learning on those rollouts
+```
+
+| Parameter | Description |
+|-----------|-------------|
+| Critical step threshold | Advantage function cutoff |
+| Rollout samples | Number from critical point |
+| Learning priority | Weight for pivotal moments |
+
+### Customization Summary
+
+| Point | Method | Use Case |
+|-------|--------|----------|
+| PARL | Training config | Fine-tuning swarm behavior |
+| Swarm Config | API params | Adjust agent count, steps |
+| Tools | API registration | Add custom capabilities |
+| Orchestrator | API params | Tune reasoning behavior |
+| Model Selection | Model ID | Balance speed vs capability |
+| GPO | Training | Optimize critical path learning |
+
+### Self-Hosting Options
+
+For on-premise deployment:
+- **vLLM**: Standard inference server
+- **SGLang**: Optimized for long contexts
+- **KTransformers**: Native INT4 quantization (2× speed)
+
+---
+
 ## Comparison Summary
 
 ### vs. Claude Code / OpenCode

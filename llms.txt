@@ -39,18 +39,19 @@ Sources:
 | [docs/tools/README.md](docs/tools/README.md) | Landing page | Comparison matrix, tool categories |
 | [docs/tools/BEST-PRACTICES.md](docs/tools/BEST-PRACTICES.md) | **Best practices** | 10 pattern categories from all 7 tools |
 | [docs/tools/UNIFIED-HARNESS.md](docs/tools/UNIFIED-HARNESS.md) | **Harness design** | Multi-provider, multi-agent architecture |
+| [docs/tools/interactive-tools-overview.html](docs/tools/interactive-tools-overview.html) | **Interactive diagrams** | Clickable architecture diagrams, tool comparison |
 
 ### Individual Tool Documentation
 
-| Tool | File | Key Architecture |
-|------|------|------------------|
-| Codex | [docs/tools/codex/README.md](docs/tools/codex/README.md) | Rust TUI, channels, typed protocols |
-| Claude Code | [docs/tools/claude-code/README.md](docs/tools/claude-code/README.md) | MCP integration, subagent delegation |
-| OpenCode | [docs/tools/opencode/README.md](docs/tools/opencode/README.md) | Multi-provider, session forking |
-| Kata | [docs/tools/kata/README.md](docs/tools/kata/README.md) | 8-phase spec-driven workflow |
-| Get-Shit-Done | [docs/tools/get-shit-done/README.md](docs/tools/get-shit-done/README.md) | Context engineering, wave execution |
-| Oh-My-OpenCode | [docs/tools/oh-my-opencode/README.md](docs/tools/oh-my-opencode/README.md) | Category delegation, swarm orchestration |
-| Kimi K2 | [docs/tools/kimi-k2/README.md](docs/tools/kimi-k2/README.md) | PARL training, 100-agent swarms |
+| Tool | File | Key Architecture | Customization Points |
+|------|------|------------------|---------------------|
+| Codex | [docs/tools/codex/README.md](docs/tools/codex/README.md) | Rust TUI, channels, typed protocols | 10 categories: Skills, Starlark rules, Config, Providers, Profiles, MCP, Approvals |
+| Claude Code | [docs/tools/claude-code/README.md](docs/tools/claude-code/README.md) | MCP integration, subagent delegation | 7 categories: MCP (5 scopes), Skills, 11 Hooks, Permissions, Subagents |
+| OpenCode | [docs/tools/opencode/README.md](docs/tools/opencode/README.md) | Multi-provider, session forking | 12 categories: 26 Plugin hooks, Tools, Agents, 18+ Providers, MCP+ACP |
+| Kata | [docs/tools/kata/README.md](docs/tools/kata/README.md) | 8-phase spec-driven workflow | 7 categories: Phases, Workflow config, Agents, XML templates, Context, Git |
+| Get-Shit-Done | [docs/tools/get-shit-done/README.md](docs/tools/get-shit-done/README.md) | Context engineering, wave execution | 5 categories: Context, Workflow config, Model profiles, Task types, Agent config |
+| Oh-My-OpenCode | [docs/tools/oh-my-opencode/README.md](docs/tools/oh-my-opencode/README.md) | Category delegation, swarm orchestration | 9 categories: 32+ Hooks, Categories, Skills, Commands, Notepads, Agents |
+| Kimi K2 | [docs/tools/kimi-k2/README.md](docs/tools/kimi-k2/README.md) | PARL training, 100-agent swarms | 6 categories: PARL config, Swarm config, Tools, Orchestrator, API, GPO |
 
 ### Reference Documentation
 
@@ -196,6 +197,23 @@ ai-agent-study-guide/
 3. Multi-provider harness architecture in UNIFIED-HARNESS.md
 4. Each tool has consistent README with diagrams
 5. Documentation-only repository (no implementation code)
+
+## Interactive Diagrams
+
+The repository includes interactive Mermaid diagrams with clickable nodes:
+
+| Feature | Location | Description |
+|---------|----------|-------------|
+| Interactive HTML | `docs/tools/interactive-tools-overview.html` | Full interactive experience with tabs, expandable cards |
+| Clickable Markdown | Tool READMEs | Mermaid `click` handlers linking to sections |
+
+**Mermaid Click Syntax:**
+```mermaid
+click nodeId "url" "tooltip"
+click nodeId "#anchor" "Jump to section"
+```
+
+**Note:** Click events require `securityLevel: 'loose'` in Mermaid initialization.
 
 ## Verification Commands
 

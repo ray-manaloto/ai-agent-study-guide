@@ -410,6 +410,188 @@ Full compatibility layer for Claude Code configurations:
 
 ---
 
+## Customization Points
+
+Oh-My-OpenCode provides **9 major customization categories** for extending its multi-agent orchestration capabilities.
+
+### Summary Table
+
+| Category | Location | Count | Description |
+|----------|----------|-------|-------------|
+| **Lifecycle Hooks** | Plugin hooks | 32+ | 6 interception points with multiple handlers |
+| **Custom Tools** | `.opencode/tools/` | 20+ | Delegation, LSP, AST-grep, sessions |
+| **Specialized Agents** | Built-in | 10 | Different models and permission levels |
+| **Skills** | `.opencode/skills/*/SKILL.md` | 3+ built-in | Playwright, Git-master, Frontend-UI-UX |
+| **Categories** | Config JSON | 7 built-in | Semantic model routing (visual-engineering, ultrabrain, etc.) |
+| **Slash Commands** | Built-in | 6+ | Ralph-loop, Ultrawork, Refactor, etc. |
+| **MCPs** | `.mcp.json` | 3+ built-in | Websearch, Context7, Grep.app |
+| **Notepad System** | `.sisyphus/notepads/` | 5 files | Wisdom accumulation per plan |
+| **Claude Code Compat** | Multiple | Full | Commands, Skills, Agents, MCPs, Hooks |
+
+### 1. Lifecycle Hooks (32+)
+
+6 interception points with multiple handlers:
+
+| Hook Point | When | Example Handlers |
+|------------|------|------------------|
+| `chat.message` | User submits | keyword-detector, think-mode |
+| `experimental.chat.messages.transform` | Before API | context injectors |
+| `event` | Session lifecycle | error recovery, notifications |
+| `tool.execute.before` | Before tool | block/modify, inject context |
+| `tool.execute.after` | After tool | add warnings, modify output |
+| `config` | Config requests | dynamic configuration |
+
+**Key Handlers:**
+- Context injection: `directory-agents-injector`, `rules-injector`, `compaction-context-injector`
+- Productivity: `keyword-detector`, `ralph-loop`, `todo-continuation-enforcer`
+- Quality: `comment-checker`, `edit-error-recovery`, `session-recovery`
+
+### 2. Category-Based Delegation
+
+Define custom semantic categories for model routing:
+
+```json
+{
+  "categories": {
+    "unity-game-dev": {
+      "model": "openai/gpt-5.2",
+      "temperature": 0.3,
+      "prompt_append": "You are a Unity game development expert..."
+    },
+    "data-science": {
+      "model": "anthropic/claude-opus-4",
+      "temperature": 0.2,
+      "prompt_append": "You are a data science expert..."
+    }
+  }
+}
+```
+
+**Built-in Categories:**
+| Category | Model | Use Case |
+|----------|-------|----------|
+| `visual-engineering` | Gemini 3 Pro | Frontend, UI/UX |
+| `ultrabrain` | GPT-5.2 Codex | Complex architecture |
+| `artistry` | Gemini 3 Pro (max) | Creative tasks |
+| `quick` | Claude Haiku 4.5 | Trivial changes |
+| `unspecified-low` | Claude Sonnet 4.5 | General, low effort |
+| `unspecified-high` | Claude Opus 4.5 | General, high effort |
+| `writing` | Gemini 3 Flash | Documentation |
+
+### 3. Skills System
+
+**Locations (priority order):**
+| Location | Scope |
+|----------|-------|
+| `.opencode/skills/*/SKILL.md` | Project |
+| `~/.config/opencode/skills/*/SKILL.md` | User |
+| `.claude/skills/*/SKILL.md` | Claude Code compat |
+| `~/.claude/skills/*/SKILL.md` | Claude Code user |
+
+**Skill Format:**
+```yaml
+---
+description: Browser automation skill
+triggers:
+  - browser
+  - screenshot
+  - navigate
+mcp:
+  playwright:
+    command: npx
+    args: ["-y", "@anthropic-ai/mcp-playwright"]
+---
+
+# Skill instructions here...
+```
+
+### 4. Custom Slash Commands
+
+Create custom commands in `.opencode/commands/` or `~/.config/opencode/commands/`:
+
+```markdown
+# my-command.md
+---
+description: My custom workflow
+---
+
+Execute specific workflow steps...
+```
+
+**Built-in Commands:**
+| Command | Purpose |
+|---------|---------|
+| `/ralph-loop` | Self-referential development loop |
+| `/ulw-loop` | Ultrawork mode loop |
+| `/refactor` | Intelligent refactoring with LSP/AST |
+| `/init-deep` | Initialize hierarchical AGENTS.md |
+| `/start-work` | Start Sisyphus work session |
+| `/cancel-ralph` | Cancel active Ralph Loop |
+
+### 5. Notepad System (Wisdom Accumulation)
+
+Configure per-plan learning storage:
+
+```
+.sisyphus/notepads/{plan-name}/
+├── learnings.md      # Patterns, conventions, successful approaches
+├── decisions.md      # Architectural choices and rationales
+├── issues.md         # Problems, blockers, gotchas
+├── verification.md   # Test results, validation outcomes
+└── problems.md       # Unresolved issues, technical debt
+```
+
+### 6. Agent Customization
+
+Built-in agents with specific models and permissions:
+
+| Agent | Model | Restrictions |
+|-------|-------|--------------|
+| **Sisyphus** | Claude Opus 4.5 | Full access (main orchestrator) |
+| **Prometheus** | Claude Opus 4.5 | READ-ONLY (planner) |
+| **Atlas** | Claude Opus 4.5 | Cannot write code (delegates) |
+| **Oracle** | GPT-5.2 | READ-ONLY consultation |
+| **Sisyphus-Junior** | Claude Sonnet 4.5 | Cannot delegate (executor) |
+
+### 7. MCP Configuration
+
+**Locations:**
+| Location | Scope |
+|----------|-------|
+| `.mcp.json` | Project |
+| `~/.claude/.mcp.json` | User |
+
+**Built-in MCPs:**
+- Websearch (Exa/Google)
+- Context7 (documentation)
+- Grep.app (code search)
+
+### 8. Background Execution
+
+Configure parallel agent execution via tmux:
+
+```typescript
+delegate_task(
+  category="ultrabrain",
+  run_in_background: true,  // Runs in tmux pane
+  prompt="Complex analysis task"
+)
+```
+
+### 9. Claude Code Compatibility Layer
+
+Full compatibility with Claude Code configurations:
+
+| Type | Oh-My-OpenCode Location | Claude Code Location |
+|------|------------------------|---------------------|
+| Commands | `.opencode/commands/` | `.claude/commands/` |
+| Skills | `.opencode/skills/` | `.claude/skills/` |
+| Agents | `.opencode/agents/` | `.claude/agents/` |
+| MCPs | `.mcp.json` | `.mcp.json` |
+| Hooks | Plugin system | `settings.json` |
+
+---
+
 ## Resources
 
 | Resource | URL |

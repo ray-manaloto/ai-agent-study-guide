@@ -75,7 +75,7 @@ OpenCode is an **open-source AI coding agent** built for the terminal, created b
 
 ---
 
-## Event Loop
+## Agent Loop
 
 ### Stream Processing Loop
 
@@ -108,10 +108,10 @@ sequenceDiagram
     Processor-->>User: Complete response
 ```
 
-### Event Loop Implementation
+### Async Event Loop (TUI Polling)
 
 ```typescript
-// Simplified event loop pattern
+// This is the TUI event loop for async I/O - distinct from the Agent Loop
 export namespace EventLoop {
   export async function wait() {
     return new Promise<void>((resolve) => {
@@ -316,6 +316,238 @@ OpenCode detects when the same tool is called 3+ times with identical input, pre
 | Multi-session | Tab-based session management |
 | File browser | Integrated file navigation |
 | Settings | GUI configuration |
+
+---
+
+## Customization Points
+
+Based on comprehensive analysis, OpenCode provides **12 major customization categories**:
+
+### 1. Plugin System (26 Hooks)
+
+**Plugin structure**:
+```typescript
+import type { Plugin } from "@opencode-ai/plugin"
+
+export const MyPlugin: Plugin = async ({ client, project, $, directory, worktree }) => {
+  return {
+    event: async ({ event }) => { /* handle events */ },
+    tool: { /* custom tools */ },
+    "tool.execute.before": async (input, output) => { /* intercept */ }
+  }
+}
+```
+
+**Hook categories**:
+| Category | Hooks |
+|----------|-------|
+| Chat | `chat.message`, `chat.params`, `chat.headers`, `messages.transform`, `system.transform` |
+| Tool | `tool.execute.before`, `tool.execute.after` |
+| Command | `command.execute.before` |
+| Permission | `permission.ask` |
+| Session | `session.compacting` |
+
+### 2. Custom Tools
+
+**Location**: `.opencode/tools/` (project) or `~/.config/opencode/tools/` (global)
+
+```typescript
+import { tool } from "@opencode-ai/plugin"
+
+export default tool({
+  description: "Tool description",
+  args: {
+    query: tool.schema.string().describe("Search query"),
+    limit: tool.schema.number().optional()
+  },
+  async execute(args, context) {
+    return "Tool result"
+  }
+})
+```
+
+### 3. Custom Agents
+
+**Location**: `.opencode/agents/*.md` or config
+
+```yaml
+# .opencode/agents/reviewer.md
+---
+description: Code review agent
+mode: subagent
+model: anthropic/claude-sonnet-4-20250514
+temperature: 0.1
+tools:
+  write: false
+  edit: false
+permission:
+  bash:
+    "*": deny
+---
+
+You are a code reviewer. Focus on security and performance.
+```
+
+**Agent modes**: `primary` (user-facing), `subagent` (invokable), `all`
+
+### 4. Provider Configuration
+
+**18+ bundled providers** via AI SDK:
+
+```json
+// opencode.json
+{
+  "provider": {
+    "anthropic": {
+      "options": {
+        "apiKey": "{env:ANTHROPIC_API_KEY}"
+      }
+    },
+    "custom": {
+      "options": {
+        "baseURL": "https://my-api.com",
+        "apiKey": "{env:MY_API_KEY}"
+      }
+    }
+  }
+}
+```
+
+### 5. MCP + ACP Integration
+
+**MCP Server types**:
+```json
+{
+  "mcp": {
+    "local-server": {
+      "type": "local",
+      "command": ["npx", "-y", "@modelcontextprotocol/server-everything"],
+      "environment": { "MY_VAR": "value" }
+    },
+    "remote-server": {
+      "type": "remote",
+      "url": "https://mcp.example.com/mcp",
+      "oauth": {
+        "clientId": "{env:CLIENT_ID}",
+        "scope": "tools:read tools:execute"
+      }
+    }
+  }
+}
+```
+
+**ACP (Agent Client Protocol)** for agent-to-agent communication.
+
+### 6. Permission Policies
+
+**Glob pattern support**:
+```json
+{
+  "permission": {
+    "edit": "ask",
+    "bash": {
+      "*": "ask",
+      "git status": "allow",
+      "rm -rf *": "deny"
+    },
+    "read": {
+      "*.env": "ask",
+      "*": "allow"
+    }
+  }
+}
+```
+
+**Actions**: `allow`, `deny`, `ask`
+
+### 7. Skills System
+
+**Location**: `.opencode/skill/*/SKILL.md`
+
+```markdown
+---
+name: my-skill
+description: What this skill does
+---
+
+## Instructions
+Skill content loaded on-demand...
+```
+
+Skills automatically become slash commands.
+
+### 8. Configuration Hierarchy
+
+**Precedence** (highest to lowest):
+1. `OPENCODE_CONFIG_CONTENT` env var
+2. Project config (`opencode.json`)
+3. Custom path (`OPENCODE_CONFIG` env var)
+4. Global config (`~/.config/opencode/opencode.json`)
+5. Remote config (`.well-known/opencode`)
+6. Managed config (enterprise)
+
+### 9. Commands System
+
+```json
+{
+  "command": {
+    "my-command": {
+      "description": "Command description",
+      "agent": "specific-agent",
+      "model": "provider/model",
+      "template": "Prompt with $1, $2, $ARGUMENTS"
+    }
+  }
+}
+```
+
+### 10. Event System (40+ Event Types)
+
+| Category | Events |
+|----------|--------|
+| Session | `session.created`, `session.updated`, `session.error`, `session.idle` |
+| Message | `message.updated`, `message.removed`, `message.part.updated` |
+| Tool | `tool.execute.before`, `tool.execute.after` |
+| Permission | `permission.asked`, `permission.replied` |
+| MCP | `mcp.tools.changed`, `mcp.browser.open.failed` |
+
+### 11. Custom Tool Categories
+
+| Category | Tools |
+|----------|-------|
+| filesystem | read, write, edit, glob, grep, list |
+| shell | bash, apply_patch |
+| web | websearch, webfetch, codesearch |
+| delegation | subagent spawning |
+| memory | todoread, todowrite |
+
+### 12. Environment Variables
+
+```json
+{
+  "provider": {
+    "options": {
+      "apiKey": "{env:API_KEY}"
+    }
+  },
+  "agent": {
+    "prompt": "{file:./prompts/agent.txt}"
+  }
+}
+```
+
+### Customization Summary
+
+| Point | Location | Scope |
+|-------|----------|-------|
+| **Plugins** | `.opencode/plugins/` | Project |
+| **Tools** | `.opencode/tools/` | Project |
+| **Agents** | `.opencode/agents/` | Project |
+| **Providers** | `opencode.json` | Project/Global |
+| **MCP** | `opencode.json` | Project/Global |
+| **Permissions** | `opencode.json` | Project |
+| **Skills** | `.opencode/skill/` | Project |
+| **Commands** | `opencode.json` | Project |
 
 ---
 

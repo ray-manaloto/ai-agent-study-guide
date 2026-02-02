@@ -93,6 +93,18 @@ flowchart TB
     
     Codex -.-> EventMsg
     App -.-> Op
+
+    click App "#layer-3-tui-layer" "View TUI Layer details"
+    click Chat "#layer-3-tui-layer" "View ChatWidget details"
+    click Approval "#approval-architecture" "View Approval Queue"
+    click TM "#layer-2-core-layer" "View ThreadManager"
+    click CT "#layer-2-core-layer" "View CodexThread"
+    click Codex "#layer-2-core-layer" "View Codex Agent"
+    click Op "#layer-1-protocol-layer" "View Op enum"
+    click EventMsg "#layer-1-protocol-layer" "View EventMsg enum"
+    click MP "#layer-4-app-server-layer" "View MessageProcessor"
+    click CMP "#layer-4-app-server-layer" "View CodexMessageProcessor"
+    click VSCode "https://github.com/openai/codex/tree/main/codex-rs/app-server" "View App Server source"
 ```
 
 ### Critical Architecture Decision
@@ -383,6 +395,11 @@ flowchart TD
     F --> G{Queue has items?}
     G -->|Yes| H[Pop next as current]
     G -->|No| I[Clear current]
+
+    click A "#approval-decisions" "View approval event types"
+    click F "#approval-decisions" "View ReviewDecision options"
+    click C "#approval-queue-implementation" "View queue implementation"
+    click D "#approval-queue-implementation" "View queue implementation"
 ```
 
 ### Approval Queue Implementation
@@ -571,6 +588,11 @@ flowchart LR
     Diagrams --> Index["llms.txt Index"]
     Concepts --> Index
     Index --> LLM["LLM Consumption"]
+
+    click Source "https://github.com/openai/codex" "View Codex-RS source on GitHub"
+    click Diagrams "docs/architecture-diagram.md" "View architecture diagrams"
+    click Concepts "docs/CONCEPTS.md" "View concepts documentation"
+    click Index "llms.txt" "View documentation index"
 ```
 
 ---
@@ -589,6 +611,10 @@ flowchart TD
     E --> F{Links Valid?}
     F -->|No| A
     F -->|Yes| G[Complete]
+
+    click B "#quality-checkpoints" "View validation tools"
+    click D "llms.txt" "View documentation index"
+    click A "#repository-architecture" "View file organization"
 ```
 
 ### Quality Checkpoints

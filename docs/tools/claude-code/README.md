@@ -106,6 +106,14 @@ flowchart TB
     Phase3 --> Success{Success?}
     Success -->|Yes| Done[Complete]
     Success -->|No| Phase1
+
+    click Search "#built-in-tools-4-categories" "View Search tools"
+    click Read "#built-in-tools-4-categories" "View File Operations"
+    click Edit "#built-in-tools-4-categories" "View File Operations"
+    click Run "#built-in-tools-4-categories" "View Execution tools"
+    click Tool "#tool-execution-flow" "View Tool Execution Flow"
+    click Test "#common-workflows" "View Test workflows"
+    click User "#message-flow" "View Message Flow"
 ```
 
 ### Loop Characteristics
@@ -166,6 +174,10 @@ flowchart TD
     Approve -->|No| Cancel[Cancel]
     Execute --> Checkpoint[Create Checkpoint]
     Checkpoint --> Result[Return Results]
+
+    click Check "#permission-modes" "View Permission Modes"
+    click Checkpoint "#checkpoint-system" "View Checkpoint System"
+    click Call "#the-agentic-loop-three-phase" "View Agentic Loop"
 ```
 
 ### Permission Modes
@@ -208,6 +220,12 @@ flowchart TB
     Result1 --> Synthesize[Main Agent Synthesizes]
     Result2 --> Synthesize
     ResultN --> Synthesize
+
+    click Main "#context-window-management" "View Context Management"
+    click Task1 "#5-custom-subagents" "View Custom Subagents"
+    click Context1 "#delegation-benefits" "View Delegation Benefits"
+    click Result1 "#delegation-benefits" "View Summary Return pattern"
+    click Synthesize "../BEST-PRACTICES.md#1-thin-orchestrator-pattern" "View Thin Orchestrator Pattern"
 ```
 
 ### Delegation Benefits
@@ -267,6 +285,164 @@ flowchart TB
 | `post-command` | After shell execution | Logging |
 | `pre-task` | Before task start | Setup |
 | `post-task` | After task completion | Cleanup |
+
+---
+
+## Customization Points
+
+Based on comprehensive research, Claude Code provides **7 major customization categories**:
+
+### 1. MCP Servers (Model Context Protocol)
+
+**Primary extension mechanism** for external tools and data sources.
+
+```bash
+# Add HTTP server (recommended)
+claude mcp add --transport http github https://api.githubcopilot.com/mcp/
+
+# Add local stdio server
+claude mcp add --transport stdio filesystem -- npx -y @modelcontextprotocol/server-filesystem
+
+# With environment variables
+claude mcp add --transport stdio --env API_KEY=xxx my-server -- npx -y my-mcp-server
+```
+
+**Configuration scopes**:
+- Local: `~/.claude.json` (personal)
+- Project: `.mcp.json` (version controlled)
+- User: `~/.claude.json` (all projects)
+- Plugin: Bundled with plugins
+- Managed: Enterprise-wide
+
+### 2. Skills System
+
+Skills are reusable instruction packages following the [Agent Skills](https://agentskills.io) standard.
+
+**SKILL.md format**:
+```yaml
+---
+name: skill-name
+description: What this skill does and when to use it
+disable-model-invocation: true  # Only user can invoke
+allowed-tools: Read, Grep, Glob  # Tool restrictions
+context: fork  # Run in isolated subagent
+agent: Explore  # Which subagent type
+---
+
+Your skill instructions here...
+```
+
+**Locations**:
+| Location | Scope |
+|----------|-------|
+| `~/.claude/skills/<skill-name>/SKILL.md` | Personal (all projects) |
+| `.claude/skills/<skill-name>/SKILL.md` | Project only |
+| `<plugin>/skills/<skill-name>/SKILL.md` | Plugin-provided |
+
+### 3. Hooks System
+
+**11 lifecycle hook events**:
+
+| Event | Purpose |
+|-------|---------|
+| `SessionStart` | Session begins/resumes |
+| `UserPromptSubmit` | Before processing user input |
+| `PreToolUse` | Before tool execution (can block) |
+| `PermissionRequest` | Permission dialog appears |
+| `PostToolUse` | After successful tool execution |
+| `PostToolUseFailure` | After tool failure |
+| `Notification` | System notification |
+| `SubagentStart/Stop` | Subagent lifecycle |
+| `Stop` | Response complete |
+| `PreCompact` | Before context compaction |
+| `SessionEnd` | Session terminates |
+
+**Configuration**:
+```json
+// ~/.claude/settings.json
+{
+  "hooks": {
+    "PreToolUse": [{
+      "matcher": "Bash",
+      "hooks": [{
+        "type": "command",
+        "command": ".claude/hooks/validate.sh",
+        "timeout": 30
+      }]
+    }]
+  }
+}
+```
+
+### 4. Permission System
+
+**Permission modes**:
+- `default` - Ask for each tool use
+- `plan` - Auto-approve read-only tools
+- `acceptEdits` - Auto-approve edits
+- `dontAsk` - Auto-approve all
+
+**Per-tool/pattern settings**:
+```json
+{
+  "permissions": {
+    "allow": ["Read", "Grep", "Glob"],
+    "deny": ["Bash(rm *)"],
+    "dontAskAgain": {
+      "Bash": ["npm test", "npm run build"]
+    }
+  }
+}
+```
+
+### 5. Custom Subagents
+
+**Create custom agents in `.claude/agents/`**:
+
+```yaml
+---
+name: custom-agent
+description: What this agent does
+model: claude-sonnet-4-5
+allowed-tools: Read, Grep, Bash
+skills: [skill1, skill2]
+---
+
+System prompt for this agent...
+```
+
+**Invocation**: Via skills with `context: fork` and `agent: <name>`, or CLI `claude --agent <name>`
+
+### 6. CLAUDE.md Context
+
+Persistent instructions loaded every session:
+
+| Location | Scope |
+|----------|-------|
+| `~/.claude/CLAUDE.md` | Global (all projects) |
+| `.claude/CLAUDE.md` | Project-specific |
+
+**Dynamic context injection**:
+- Skills with `` `!command` `` syntax inject shell output
+- `SessionStart` hooks can add context via stdout
+
+### 7. Slash Commands
+
+Skills automatically become slash commands:
+- Built-in: `/help`, `/compact`, `/init`, `/hooks`, `/permissions`, `/mcp`
+- Custom: Create skill → `/skill-name`
+- Legacy: `.claude/commands/` (skills recommended)
+
+### Customization Summary
+
+| Point | Configuration | Shareable |
+|-------|---------------|-----------|
+| **MCP Servers** | `.mcp.json`, `~/.claude.json` | Yes |
+| **Skills** | `.claude/skills/*/SKILL.md` | Yes |
+| **Hooks** | `.claude/settings.json` | Yes |
+| **Permissions** | `.claude/settings.json` | Yes |
+| **Subagents** | `.claude/agents/*.md` | Yes |
+| **CLAUDE.md** | `.claude/CLAUDE.md` | Yes |
 
 ---
 

@@ -61,6 +61,18 @@ flowchart TB
 
     VSCode -->|JSON-RPC| AppServer
     AppServer --> ThreadManager
+
+    click App "#tui-components-from-codex-rstui" "View App struct details"
+    click ChatWidget "#chatwidget" "View ChatWidget handlers"
+    click ChatComposer "#file-locations" "View ChatComposer location"
+    click ApprovalOverlay "#approvaloverlay" "View ApprovalOverlay struct"
+    click ThreadManager "https://github.com/openai/codex/blob/main/codex-rs/core/src/thread_manager.rs" "View source"
+    click CodexThread "https://github.com/openai/codex/blob/main/codex-rs/core/src/codex_thread.rs" "View source"
+    click Codex "https://github.com/openai/codex/blob/main/codex-rs/core/src/codex.rs" "View source"
+    click Op "#op-enum-operations-submitted-to-agent" "View Op enum variants"
+    click EventMsg "#eventmsg-enum-events-emitted-by-agent" "View EventMsg variants"
+    click Event "#event-wrapper" "View Event struct"
+    click AppServer "#external-client-flow-app-server" "View App Server flow"
 ```
 
 ---

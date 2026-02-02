@@ -6,7 +6,7 @@
 
 ## Overview
 
-This directory contains detailed documentation for leading AI coding agent tools and frameworks. Each tool is analyzed for its architecture, event loop, multi-agent capabilities, and integration patterns.
+This directory contains detailed documentation for leading AI coding agent tools and frameworks. Each tool is analyzed for its architecture, agent loop, multi-agent capabilities, and integration patterns.
 
 | Tool | Type | Provider Support | Multi-Agent | Key Feature |
 |------|------|------------------|-------------|-------------|
@@ -182,9 +182,9 @@ Spec-driven development orchestrator for Claude Code. Features phase-based workf
 
 ## Comparison Matrix
 
-### Event Loop Architecture
+### Agent Loop Architecture
 
-| Tool | Event Loop Type | Message Format | Async Model |
+| Tool | Agent Loop Type | Message Format | Async Model |
 |------|-----------------|----------------|-------------|
 | Codex | Channel-based | Op/EventMsg enums | Tokio async |
 | Claude Code | MCP-based | JSON-RPC | Node async |
@@ -218,9 +218,9 @@ Spec-driven development orchestrator for Claude Code. Features phase-based workf
 
 ## Universal Patterns
 
-### Common Event Loop Pattern
+### Common Agent Loop Pattern
 
-All tools follow a similar core pattern:
+All tools follow a similar core agent loop pattern:
 
 ```
 User Input → Parse → Route → Execute → Stream → Display
@@ -245,6 +245,20 @@ User Input → Parse → Route → Execute → Stream → Display
 2. **Policy-Based** - Rules determine auto-approval
 3. **Trust Levels** - Tiered permissions by risk
 4. **Session Memory** - Learn from past approvals
+
+---
+
+## Interactive Diagrams
+
+For an interactive exploration experience with clickable nodes:
+
+- **[Interactive Tools Overview](interactive-tools-overview.html)** - Clickable architecture diagrams, tool comparison, and navigation
+
+Features:
+- Click diagram nodes to navigate to detailed documentation
+- Expandable tool cards with customization details
+- Side-by-side architecture comparison
+- Feature matrix with direct links
 
 ---
 

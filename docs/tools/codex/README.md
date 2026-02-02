@@ -374,6 +374,197 @@ sequenceDiagram
 
 ---
 
+## Customization Points
+
+Based on comprehensive analysis of the Codex codebase, here are **10 major customization categories**:
+
+### 1. Skills System
+
+**Location**: `~/.codex/skills/*/SKILL.md` (user), `.codex/skills/*/SKILL.md` (project)
+
+Skills are Codex's primary extension mechanism for adding capabilities.
+
+```markdown
+---
+name: skill-name
+description: Description for skill selection
+metadata:
+  short-description: User-facing description
+---
+
+Instructions for Codex to follow when using this skill.
+```
+
+**Installation**:
+```bash
+# Built-in installer skill
+$skill-installer install the linear skill from the .experimental folder
+
+# Manual
+mkdir -p ~/.codex/skills/my-skill && create SKILL.md
+```
+
+### 2. Rules System (Starlark-based)
+
+**Location**: `~/.codex/rules/*.rules`
+
+Fine-grained control over command execution approval:
+
+```python
+prefix_rule(
+    pattern = ["gh", "pr", "view"],
+    decision = "allow",  # or "prompt" or "forbidden"
+    justification = "Viewing PRs is safe",
+    match = ["gh pr view 7888"],
+    not_match = ["gh pr --repo openai/codex view 7888"],
+)
+```
+
+**Test rules**:
+```bash
+codex execpolicy check --pretty --rules ~/.codex/rules/default.rules -- gh pr view 7888
+```
+
+### 3. Configuration System
+
+**Layers** (highest to lowest precedence):
+1. CLI overrides (`--model`, `--profile`)
+2. Project config (`.codex/config.toml`)
+3. User config (`~/.codex/config.toml`)
+4. Admin config (`/etc/codex/config.toml`)
+5. System defaults
+
+**Key options**:
+```toml
+# ~/.codex/config.toml
+model = "gpt-5-codex"
+model_provider = "openai"
+approval_policy = "untrusted"  # or "on-failure", "on-request", "never"
+sandbox_mode = "workspace-write"
+
+[features]
+web_search = "live"
+```
+
+### 4. Provider Extensions
+
+Add custom model providers:
+
+```toml
+[model_providers.anthropic]
+name = "Anthropic"
+base_url = "https://api.anthropic.com/v1"
+env_key = "ANTHROPIC_API_KEY"
+wire_api = "chat"
+request_max_retries = 4
+
+[model_providers.anthropic.http_headers]
+"anthropic-version" = "2023-06-01"
+```
+
+**Built-in providers**: OpenAI, Ollama, LMStudio, OpenAI-compatible
+
+### 5. Profiles
+
+Named configuration presets:
+
+```toml
+profile = "work"  # Default profile
+
+[profiles.work]
+model = "gpt-5-codex"
+approval_policy = "untrusted"
+
+[profiles.personal]
+model = "gpt-4o"
+approval_policy = "on-failure"
+
+[profiles.oss]
+oss_provider = "ollama"
+model = "codellama"
+```
+
+**Usage**: `codex --profile personal`
+
+### 6. MCP Servers
+
+**STDIO servers**:
+```toml
+[mcp_servers.context7]
+command = "npx"
+args = ["-y", "@upstash/context7-mcp"]
+env = { MY_ENV_VAR = "value" }
+startup_timeout_sec = 10
+```
+
+**HTTP servers**:
+```toml
+[mcp_servers.figma]
+url = "https://mcp.figma.com/mcp"
+bearer_token_env_var = "FIGMA_OAUTH_TOKEN"
+```
+
+**Commands**: `codex mcp add`, `codex mcp list`, `codex mcp remove`
+
+### 7. Approval Policies
+
+| Mode | Behavior |
+|------|----------|
+| `untrusted` | Prompt for all except known-safe read-only |
+| `on-failure` | Auto-approve in sandbox, escalate on failure |
+| `on-request` | Model decides when to ask |
+| `never` | Never prompt (dangerous) |
+
+### 8. AGENTS.md (Project Instructions)
+
+**Location**: `$REPO_ROOT/AGENTS.md` or `.codex/AGENTS.md`
+
+```toml
+# Override location
+model_instructions_file = "/path/to/custom/instructions.md"
+
+# Fallback filenames
+project_doc_fallback_filenames = ["CODEX.md", "AI.md"]
+
+# Max size
+project_doc_max_bytes = 65536
+```
+
+### 9. Event System (Notifications)
+
+While Codex lacks traditional hooks, it provides a notification system:
+
+```toml
+# External command receives JSON payload after each turn
+notify = ["notify-send", "Codex"]
+```
+
+Events: turn complete, command execution, patch apply, file changes
+
+### 10. Tool Registration
+
+Built-in tools include: `ApplyPatch`, `GrepFiles`, `ListDir`, `ReadFile`, `Shell`, `ViewImage`, `Plan`
+
+Tools registered via:
+- Built-in handlers in `codex-rs/core/src/tools/handlers/`
+- MCP servers (dynamic discovery)
+
+### Customization Summary
+
+| Point | Method | Location |
+|-------|--------|----------|
+| Skills | SKILL.md files | `~/.codex/skills/*/` |
+| Rules | Starlark rules | `~/.codex/rules/*.rules` |
+| Config | TOML files | `~/.codex/config.toml` |
+| Providers | Config | `[model_providers.*]` |
+| Profiles | Config | `[profiles.*]` |
+| MCP | Config | `[mcp_servers.*]` |
+| Approvals | Policy + Rules | `approval_policy` + rules |
+| Instructions | Markdown | `AGENTS.md` |
+| Notifications | Config | `notify = [...]` |
+
+---
+
 ## Key Architectural Patterns
 
 ### 1. Direct Channel Communication
