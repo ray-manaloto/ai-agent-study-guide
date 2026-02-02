@@ -1,26 +1,39 @@
 # AGENTS.md
 
-> AI Agent Study Guide - Learn to build coding agents by studying OpenAI Codex-RS
+> AI Agent Study Guide - Learn to build coding agents by studying 7 production implementations
 
 ---
 
 ## Project Overview
 
-This repository documents the architecture of OpenAI's Codex-RS TUI implementation. By studying this production AI coding agent, we extract patterns and insights for building similar systems.
+This repository documents the architecture of 7 leading AI coding agent implementations. By studying these production tools, we extract patterns and insights for building similar systems.
 
 | Attribute | Value |
 |-----------|-------|
 | Repository Type | Documentation only |
-| Implementation Code | **NONE** (forbidden) |
-| Source Being Studied | https://github.com/openai/codex |
-| Primary Focus | TUI ↔ Agent communication patterns |
+| Implementation Code | **NONE** (reference architecture only) |
+| Tools Studied | Codex, Claude Code, OpenCode, Kata, Get-Shit-Done, Oh-My-OpenCode, Kimi K2 |
+| Primary Focus | Multi-agent orchestration patterns |
+
+### Tools Covered
+
+| Tool | Type | Source | Key Contribution |
+|------|------|--------|------------------|
+| Codex | CLI/TUI | [openai/codex](https://github.com/openai/codex) | Channel-based architecture |
+| Claude Code | CLI | Anthropic (Closed) | MCP integration, subagents |
+| OpenCode | CLI/TUI | [anomalyco/opencode](https://github.com/anomalyco/opencode) | Multi-provider abstraction |
+| Kata | Orchestrator | [gannonh/kata](https://github.com/gannonh/kata) | Spec-driven phases |
+| Get-Shit-Done | Framework | [glittercowboy/get-shit-done](https://github.com/glittercowboy/get-shit-done) | Context engineering |
+| Oh-My-OpenCode | Framework | [sizzldev/oh-my-opencode](https://github.com/sizzldev/oh-my-opencode) | Category delegation |
+| Kimi K2 | Model+API | [kimi.com](https://kimi.com) | PARL, 100-agent swarms |
 
 ### Purpose
 
 1. **Learn** - Understand how production AI coding agents work
 2. **Document** - Create clear architecture diagrams with source references
 3. **Extract** - Identify reusable patterns for agent development
-4. **Template** - Provide tools for LLM-optimizing other projects
+4. **Synthesize** - Combine best practices into unified guidance
+5. **Template** - Provide tools for LLM-optimizing other projects
 
 ---
 
@@ -31,9 +44,10 @@ AI agents working on this repository have specific roles:
 | Role | Responsibility | Allowed Actions |
 |------|----------------|-----------------|
 | Documentation Author | Create/update docs | Edit markdown, create diagrams |
-| Architecture Analyst | Study Codex-RS source | Read source, document findings |
+| Architecture Analyst | Study tool sources | Read source, document findings |
 | Index Maintainer | Keep indexes current | Update llms.txt, llms-full.txt |
 | Quality Reviewer | Verify documentation | Check links, validate Mermaid |
+| Pattern Synthesizer | Extract common patterns | Create BEST-PRACTICES.md content |
 
 ### Not Allowed Roles
 
@@ -53,12 +67,11 @@ AI agents working on this repository have specific roles:
 | Priority | File | Purpose | Read When |
 |----------|------|---------|-----------|
 | 1 | `AGENTS.md` | This file - agent coordination | Always first |
-| 2 | `llms.txt` | Documentation index | Quick reference |
-| 3 | `llms-full.txt` | Complete context | Deep understanding |
-| 4 | `docs/WORKFLOWS.md` | Task execution steps | Before making changes |
-| 5 | `docs/architecture-diagram.md` | Technical diagrams | Understanding architecture |
-| 6 | `docs/CONCEPTS.md` | Core concepts | Learning patterns |
-| 7 | `docs/PATTERNS.md` | Implementation patterns | Reusable code |
+| 2 | `docs/tools/README.md` | Tools overview | Understanding tools |
+| 3 | `docs/tools/BEST-PRACTICES.md` | Combined patterns | Learning best practices |
+| 4 | `docs/tools/UNIFIED-HARNESS.md` | Harness architecture | Designing systems |
+| 5 | `llms.txt` | Documentation index | Quick reference |
+| 6 | Individual tool READMEs | Deep dives | Tool-specific study |
 
 ### Quick Start
 
@@ -70,10 +83,11 @@ cd ai-agent-study-guide
 # Read documentation index
 cat llms.txt
 
-# View main diagrams
-glow docs/architecture-diagram.md
-# or
-open docs/codex-architecture.html
+# View tools overview
+glow docs/tools/README.md
+
+# View best practices
+glow docs/tools/BEST-PRACTICES.md
 ```
 
 ---
@@ -94,13 +108,28 @@ ai-agent-study-guide/
     └── render-diagrams.sh # Mermaid validation
 ```
 
-### docs/ Directory
+### docs/tools/ Directory (Primary)
+
+```
+docs/tools/
+├── README.md              # Landing page with comparison matrix
+├── BEST-PRACTICES.md      # Combined best practices (10 categories)
+├── UNIFIED-HARNESS.md     # Multi-provider harness architecture
+├── codex/README.md        # Codex deep-dive
+├── claude-code/README.md  # Claude Code deep-dive
+├── opencode/README.md     # OpenCode deep-dive
+├── kata/README.md         # Kata deep-dive
+├── get-shit-done/README.md # Get-Shit-Done deep-dive
+├── oh-my-opencode/README.md # Oh-My-OpenCode deep-dive
+└── kimi-k2/README.md      # Kimi K2 deep-dive
+```
+
+### docs/ Directory (Reference)
 
 ```
 docs/
 ├── AGENTS.md              # Subdirectory agent context
-├── architecture-diagram.md # Mermaid diagrams (PRIMARY)
-├── codex-architecture.html # Generated HTML (DO NOT EDIT)
+├── architecture-diagram.md # Mermaid diagrams (Codex-focused)
 ├── CONCEPTS.md            # Core concepts
 ├── GLOSSARY.md            # Term definitions
 ├── PATTERNS.md            # Implementation patterns
@@ -116,69 +145,86 @@ docs/
 
 | File | Purpose | Update Frequency |
 |------|---------|------------------|
-| `architecture-diagram.md` | Primary technical reference | When studying new components |
-| `CONCEPTS.md` | Communication and safety patterns | When identifying new patterns |
-| `GLOSSARY.md` | Term definitions | When encountering new terms |
-| `PATTERNS.md` | Reusable implementation patterns | When extracting patterns |
-| `WORKFLOWS.md` | Task execution guides | When processes change |
-| `TOOLS-RESEARCH.md` | External AI tools | When discovering tools |
+| `docs/tools/BEST-PRACTICES.md` | Combined best practices | When discovering new patterns |
+| `docs/tools/UNIFIED-HARNESS.md` | Harness architecture | When improving design |
+| `docs/tools/*/README.md` | Tool deep-dives | When studying tools |
+| `docs/CONCEPTS.md` | Communication patterns | When identifying patterns |
+| `docs/PATTERNS.md` | Implementation patterns | When extracting patterns |
+
+---
+
+## Key Best Practices (Quick Reference)
+
+From [docs/tools/BEST-PRACTICES.md](docs/tools/BEST-PRACTICES.md):
+
+### 1. Thin Orchestrator Pattern (CRITICAL)
+
+```
+Main context: 30-40% capacity
+Subagent context: Fresh 200k window
+Returns: Summary only (not full output)
+```
+
+### 2. Category-Based Delegation
+
+```
+visual-engineering → Best at UI/UX
+ultrabrain → Most capable (complex logic)
+quick → Fastest (typo fixes)
+deep → Thorough (research)
+```
+
+### 3. Wave-Based Execution
+
+```
+Wave 1: [Task A, B, C] ← Independent, parallel
+Wave 2: [Task D, E]    ← Depend on Wave 1
+Wave 3: [Task F]       ← Depends on Wave 2
+```
+
+### 4. Approval Queue Pattern
+
+```
+Process one approval at a time
+Never parallel approvals
+Queue pending requests
+```
 
 ---
 
 ## Allowed Tasks
 
-### Task: Add New Diagram
+### Task: Add New Tool Documentation
 
-**When**: Documenting a new Codex-RS component or flow.
-
-**Steps**:
-1. Research component in Codex-RS source
-2. Add Mermaid diagram to `docs/architecture-diagram.md`
-3. Include file paths in participant labels
-4. Validate: `./scripts/render-diagrams.sh`
-5. Update `llms.txt` with new content reference
-6. Update `llms-full.txt` with details
-
-**Quality Criteria**:
-- [ ] Diagram renders without errors
-- [ ] File paths in participant labels
-- [ ] Consistent with existing diagram style
-- [ ] Indexes updated
-
-### Task: Update Documentation
-
-**When**: Improving or correcting existing documentation.
+**When**: Documenting a new AI coding agent tool.
 
 **Steps**:
-1. Read current content
-2. Check cross-references: `grep -l "[topic]" *.txt docs/*.md`
-3. Make changes maintaining style consistency
-4. Update all cross-references
-5. Verify with `glow docs/[file].md`
+1. Research the tool's architecture
+2. Create `docs/tools/[tool-name]/README.md`
+3. Follow existing README template (overview, diagrams, patterns)
+4. Update `docs/tools/README.md` comparison matrix
+5. Update `llms.txt` with new entries
+6. Consider updating `BEST-PRACTICES.md` if new patterns found
 
-**Quality Criteria**:
-- [ ] Consistent with existing style
-- [ ] All cross-references updated
-- [ ] No broken links
+### Task: Update Best Practices
 
-### Task: Add New Concept
-
-**When**: Documenting a communication pattern, safety pattern, or architectural concept.
+**When**: Discovering new patterns from tool analysis.
 
 **Steps**:
-1. Choose correct file:
-   - Communication pattern → `docs/CONCEPTS.md`
-   - Implementation pattern → `docs/PATTERNS.md`
-   - Term definition → `docs/GLOSSARY.md`
-2. Follow existing format
-3. Include source file reference
-4. Update indexes
+1. Identify the pattern and its source(s)
+2. Add to appropriate section in `BEST-PRACTICES.md`
+3. Include code examples if applicable
+4. Update `llms.txt` if significant addition
 
-**Quality Criteria**:
-- [ ] Correct file chosen
-- [ ] Follows existing format
-- [ ] Source reference included
-- [ ] Indexes updated
+### Task: Update Unified Harness
+
+**When**: Improving the multi-provider harness design.
+
+**Steps**:
+1. Identify the improvement
+2. Update `UNIFIED-HARNESS.md`
+3. Ensure consistency with BEST-PRACTICES.md
+4. Update llms.txt if significant
 
 ### Task: Verify Repository Integrity
 
@@ -190,16 +236,16 @@ docs/
 ./scripts/render-diagrams.sh
 
 # 2. Check file structure
-ls -la docs/
+ls -la docs/tools/
 
-# 3. Verify indexes are current
-head -50 llms.txt
+# 3. Verify all tool READMEs exist
+ls docs/tools/*/README.md
 
-# 4. Check for broken links
-grep -r "github.com/openai/codex" docs/ | head -20
+# 4. Check indexes are current
+head -100 llms.txt
 
 # 5. Preview documentation
-glow docs/architecture-diagram.md
+glow docs/tools/BEST-PRACTICES.md
 ```
 
 ---
@@ -208,69 +254,69 @@ glow docs/architecture-diagram.md
 
 | Action | Reason | Alternative |
 |--------|--------|-------------|
-| Create implementation code | Documentation-only repository | Document patterns instead |
+| Create implementation code | Documentation-only repository | Document reference architecture |
 | Modify HTML directly | Must regenerate from Mermaid | Edit source markdown |
 | Add dependencies | No package manager | Document external tools |
-| Create test files | No testing framework | Document test patterns |
-| Add build configuration | No build system | Use existing scripts |
 | Skip index updates | Breaks discoverability | Always update llms.txt |
+| Delete tool documentation | Loses research | Archive or update instead |
 
 ---
 
 ## Task Workflows
 
-### Workflow 1: New Architecture Component
+### Workflow 1: New Tool Analysis
 
 ```mermaid
 flowchart TD
-    A[Start] --> B[Research Codex-RS source]
-    B --> C[Create Mermaid diagram]
-    C --> D[Add to architecture-diagram.md]
-    D --> E[Validate with render-diagrams.sh]
-    E --> F{Renders OK?}
-    F -->|No| C
-    F -->|Yes| G[Update llms.txt]
-    G --> H[Update llms-full.txt]
-    H --> I[Done]
+    A[Start] --> B[Research tool source]
+    B --> C[Document architecture]
+    C --> D[Create Mermaid diagrams]
+    D --> E[Write tool README]
+    E --> F[Update tools/README.md]
+    F --> G[Extract patterns]
+    G --> H{New patterns?}
+    H -->|Yes| I[Update BEST-PRACTICES.md]
+    H -->|No| J[Update llms.txt]
+    I --> J
+    J --> K[Done]
 ```
 
-### Workflow 2: Documentation Update
+### Workflow 2: Pattern Synthesis
 
 ```mermaid
 flowchart TD
-    A[Start] --> B[Read current content]
-    B --> C[Check cross-references]
-    C --> D[Make changes]
-    D --> E[Update indexes]
-    E --> F[Verify with glow]
-    F --> G{Quality OK?}
-    G -->|No| D
-    G -->|Yes| H[Done]
-```
-
-### Workflow 3: Pattern Extraction
-
-```mermaid
-flowchart TD
-    A[Identify pattern in source] --> B[Document problem]
-    B --> C[Document solution with code]
-    C --> D[List benefits]
-    D --> E[Add to PATTERNS.md]
-    E --> F[Update indexes]
-    F --> G[Done]
+    A[Identify pattern in tool] --> B[Check if pattern exists]
+    B --> C{Exists?}
+    C -->|Yes| D[Add source to existing]
+    C -->|No| E[Create new section]
+    D --> F[Update BEST-PRACTICES.md]
+    E --> F
+    F --> G[Update llms.txt]
+    G --> H[Done]
 ```
 
 ---
 
-## Verification Commands
+## Quality Standards
 
-| Command | Purpose | When to Run |
-|---------|---------|-------------|
-| `./scripts/render-diagrams.sh` | Validate Mermaid | After diagram changes |
-| `glow docs/[file].md` | Preview markdown | After any doc change |
-| `open docs/codex-architecture.html` | View rendered diagrams | Visual verification |
-| `wc -l docs/*.md` | Check doc coverage | Periodic review |
-| `grep -r "TODO" docs/` | Find incomplete items | Before completing work |
+### Documentation Quality
+
+| Standard | Requirement |
+|----------|-------------|
+| Accuracy | Verify against tool source |
+| Completeness | Include architecture, diagrams, patterns |
+| Clarity | Concise, tables over prose |
+| Consistency | Follow existing README template |
+| References | Include source URLs |
+
+### Best Practices Quality
+
+| Standard | Requirement |
+|----------|-------------|
+| Attribution | Cite source tools |
+| Code examples | Include when applicable |
+| Comparison | Show tool-specific variations |
+| Actionable | Provide implementation guidance |
 
 ---
 
@@ -282,32 +328,16 @@ When working in subdirectories, additional context files exist:
 |-----------|------------|---------|
 | `docs/` | `docs/AGENTS.md` | Documentation-specific instructions |
 
-### docs/AGENTS.md Content
-
-The `docs/AGENTS.md` file contains:
-- Local file descriptions
-- Editing rules for docs
-- Subdirectory-specific constraints
-
 ---
 
 ## Templates
 
 ### For LLM-Optimizing Other Projects
 
-This repository includes templates to help apply AI-first patterns to other projects:
-
 | Template | Location | Use Case |
 |----------|----------|----------|
 | Manual Template | `docs/templates/LLM-OPTIMIZATION-TEMPLATE.md` | Step-by-step manual process |
 | Agent Skill | `docs/templates/llm-project-optimization/SKILL.md` | Installable agent skill |
-
-### Template Usage
-
-1. Copy template to target project
-2. Customize for project specifics
-3. Create project-specific AGENTS.md
-4. Add llms.txt index
 
 ---
 
@@ -335,37 +365,6 @@ When passing work between agents:
 
 ---
 
-## Quality Standards
-
-### Documentation Quality
-
-| Standard | Requirement |
-|----------|-------------|
-| Accuracy | Verify against Codex-RS source |
-| Completeness | Include all relevant details |
-| Clarity | Concise, no filler words |
-| Consistency | Match existing style |
-| References | Include source file paths |
-
-### Diagram Quality
-
-| Standard | Requirement |
-|----------|-------------|
-| Renders | Must validate with render-diagrams.sh |
-| Labels | Include file paths in participants |
-| Style | Consistent with existing diagrams |
-| Accuracy | Reflects actual source code |
-
-### Index Quality
-
-| Standard | Requirement |
-|----------|-------------|
-| Current | Updated after every change |
-| Complete | All content referenced |
-| Accurate | Descriptions match content |
-
----
-
 ## Anti-Patterns
 
 ### Documentation Anti-Patterns
@@ -373,8 +372,8 @@ When passing work between agents:
 | Anti-Pattern | Problem | Solution |
 |--------------|---------|----------|
 | Verbose prose | Hard to scan | Use tables, bullets |
-| Missing sources | Can't verify | Always cite source files |
-| Outdated content | Misleading | Verify against current source |
+| Missing sources | Can't verify | Always cite source tools |
+| Inconsistent format | Confusing | Follow README template |
 | Orphaned content | Undiscoverable | Update indexes |
 
 ### Process Anti-Patterns
@@ -384,44 +383,7 @@ When passing work between agents:
 | Skip validation | Broken diagrams | Always run render-diagrams.sh |
 | Forget indexes | Content lost | Update llms.txt every time |
 | Large changes | Hard to review | Break into focused updates |
-| No cross-refs | Fragmented knowledge | Link related content |
-
----
-
-## Codex-RS Architecture Summary
-
-### Key Insight
-
-**TUI communicates directly with ThreadManager, NOT through MessageProcessor.**
-
-```
-CORRECT:  TUI App → ThreadManager → CodexThread → Codex
-WRONG:    TUI App → MessageProcessor → ThreadManager
-```
-
-MessageProcessor is only for external JSON-RPC clients (VS Code, etc.).
-
-### Key Types
-
-| Type | Direction | Purpose |
-|------|-----------|---------|
-| `Op` | User → Agent | Operations (UserTurn, ExecApproval) |
-| `EventMsg` | Agent → User | Events (TurnStarted, AgentMessage) |
-| `Event` | Wrapper | Contains id + EventMsg |
-
-### Layer Architecture
-
-```
-┌─────────────────────────────┐
-│  TUI Layer (presentation)   │
-├─────────────────────────────┤
-│  Core Layer (business)      │
-├─────────────────────────────┤
-│  Protocol Layer (contract)  │
-├─────────────────────────────┤
-│  App Server (external only) │
-└─────────────────────────────┘
-```
+| Duplicate patterns | Fragmented knowledge | Consolidate in BEST-PRACTICES.md |
 
 ---
 
@@ -429,10 +391,12 @@ MessageProcessor is only for external JSON-RPC clients (VS Code, etc.).
 
 | Resource | URL | Purpose |
 |----------|-----|---------|
-| Codex-RS Source | https://github.com/openai/codex | Primary source |
-| Protocol Types | `.../codex-rs/protocol/src/protocol.rs` | Op, EventMsg definitions |
-| TUI Implementation | `.../codex-rs/tui/` | UI components |
-| Core Implementation | `.../codex-rs/core/` | Agent logic |
+| Codex Source | https://github.com/openai/codex | Rust TUI reference |
+| OpenCode Source | https://github.com/anomalyco/opencode | Multi-provider reference |
+| Kata Source | https://github.com/gannonh/kata | Orchestration reference |
+| Get-Shit-Done Source | https://github.com/glittercowboy/get-shit-done | Context engineering |
+| Oh-My-OpenCode | https://github.com/sizzldev/oh-my-opencode | Swarm orchestration |
+| Kimi K2 | https://kimi.com | PARL reference |
 | Mermaid Docs | https://mermaid.js.org/ | Diagram syntax |
 | llms.txt Standard | https://llmstxt.org/ | Index format |
 
@@ -444,10 +408,10 @@ Before completing any task, verify:
 
 - [ ] No implementation code created
 - [ ] Mermaid diagrams validate
-- [ ] Source file paths included
-- [ ] GitHub links are valid
+- [ ] Source URLs included
 - [ ] `llms.txt` updated
-- [ ] `llms-full.txt` updated (if significant)
+- [ ] Tool comparison matrix updated (if new tool)
+- [ ] BEST-PRACTICES.md updated (if new pattern)
 - [ ] Consistent with existing style
 - [ ] All cross-references valid
 - [ ] Quality standards met

@@ -1,15 +1,23 @@
 # AI Agent Study Guide
 
-> Documentation repository studying OpenAI Codex-RS TUI architecture for building AI coding agents.
+> Documentation repository studying 7 AI coding agent implementations for building your own agents.
 
-Source: https://github.com/openai/codex
+Sources:
+- Codex: https://github.com/openai/codex
+- Claude Code: Anthropic (Closed)
+- OpenCode: https://github.com/anomalyco/opencode
+- Kata: https://github.com/gannonh/kata
+- Get-Shit-Done: https://github.com/glittercowboy/get-shit-done
+- Oh-My-OpenCode: https://github.com/sizzldev/oh-my-opencode
+- Kimi K2: https://kimi.com
 
 ## Entry Points
 
 - [AGENTS.md](AGENTS.md): AI agent instructions and coordination (read first)
+- [docs/tools/README.md](docs/tools/README.md): Tools landing page with comparison matrix
+- [docs/tools/BEST-PRACTICES.md](docs/tools/BEST-PRACTICES.md): Combined best practices from all 7 tools
+- [docs/tools/UNIFIED-HARNESS.md](docs/tools/UNIFIED-HARNESS.md): Multi-provider harness architecture
 - [llms-full.txt](llms-full.txt): Complete context dump for deep understanding
-- [docs/WORKFLOWS.md](docs/WORKFLOWS.md): Step-by-step task workflows
-- [docs/architecture-diagram.md](docs/architecture-diagram.md): Primary technical reference with Mermaid diagrams
 
 ## Documentation Index
 
@@ -17,24 +25,43 @@ Source: https://github.com/openai/codex
 
 | File | Lines | Purpose |
 |------|-------|---------|
-| [AGENTS.md](AGENTS.md) | 300+ | AI agent coordination and instructions |
+| [AGENTS.md](AGENTS.md) | 450+ | AI agent coordination and instructions |
 | [CLAUDE.md](CLAUDE.md) | 300+ | Claude Code configuration |
 | [.cursorrules](.cursorrules) | 300+ | Cursor AI rules |
-| [llms.txt](llms.txt) | 300+ | This documentation index |
+| [llms.txt](llms.txt) | 400+ | This documentation index |
 | [llms-full.txt](llms-full.txt) | Variable | Complete context dump |
-| [README.md](README.md) | ~50 | Project overview |
+| [README.md](README.md) | 250+ | Project overview |
 
-### Documentation Files
+### Tools Documentation (NEW)
 
 | File | Purpose | Key Content |
 |------|---------|-------------|
-| [docs/architecture-diagram.md](docs/architecture-diagram.md) | Mermaid diagrams | TUI-Core communication, approval flow, state machine |
-| [docs/CONCEPTS.md](docs/CONCEPTS.md) | Core concepts | Communication patterns, safety patterns, thread management |
-| [docs/GLOSSARY.md](docs/GLOSSARY.md) | Term definitions | Op, EventMsg, ThreadManager, CodexThread |
-| [docs/PATTERNS.md](docs/PATTERNS.md) | Implementation patterns | Typed protocol, event-driven UI, approval queue |
-| [docs/WORKFLOWS.md](docs/WORKFLOWS.md) | Task workflows | Add diagram, update docs, verify integrity |
-| [docs/TOOLS-RESEARCH.md](docs/TOOLS-RESEARCH.md) | AI tools research | agent-browser, skills CLI, opensrc |
-| [docs/AGENTS.md](docs/AGENTS.md) | Subdirectory context | Local agent instructions for docs/ |
+| [docs/tools/README.md](docs/tools/README.md) | Landing page | Comparison matrix, tool categories |
+| [docs/tools/BEST-PRACTICES.md](docs/tools/BEST-PRACTICES.md) | **Best practices** | 10 pattern categories from all 7 tools |
+| [docs/tools/UNIFIED-HARNESS.md](docs/tools/UNIFIED-HARNESS.md) | **Harness design** | Multi-provider, multi-agent architecture |
+
+### Individual Tool Documentation
+
+| Tool | File | Key Architecture |
+|------|------|------------------|
+| Codex | [docs/tools/codex/README.md](docs/tools/codex/README.md) | Rust TUI, channels, typed protocols |
+| Claude Code | [docs/tools/claude-code/README.md](docs/tools/claude-code/README.md) | MCP integration, subagent delegation |
+| OpenCode | [docs/tools/opencode/README.md](docs/tools/opencode/README.md) | Multi-provider, session forking |
+| Kata | [docs/tools/kata/README.md](docs/tools/kata/README.md) | 8-phase spec-driven workflow |
+| Get-Shit-Done | [docs/tools/get-shit-done/README.md](docs/tools/get-shit-done/README.md) | Context engineering, wave execution |
+| Oh-My-OpenCode | [docs/tools/oh-my-opencode/README.md](docs/tools/oh-my-opencode/README.md) | Category delegation, swarm orchestration |
+| Kimi K2 | [docs/tools/kimi-k2/README.md](docs/tools/kimi-k2/README.md) | PARL training, 100-agent swarms |
+
+### Reference Documentation
+
+| File | Purpose | Key Content |
+|------|---------|-------------|
+| [docs/architecture-diagram.md](docs/architecture-diagram.md) | Mermaid diagrams | TUI-Core communication, approval flow |
+| [docs/CONCEPTS.md](docs/CONCEPTS.md) | Core concepts | Communication, safety, threading |
+| [docs/GLOSSARY.md](docs/GLOSSARY.md) | Term definitions | Op, EventMsg, ThreadManager |
+| [docs/PATTERNS.md](docs/PATTERNS.md) | Implementation patterns | Typed protocol, event-driven UI |
+| [docs/WORKFLOWS.md](docs/WORKFLOWS.md) | Task workflows | Add diagram, update docs |
+| [docs/TOOLS-RESEARCH.md](docs/TOOLS-RESEARCH.md) | AI tools research | agent-browser, skills CLI |
 
 ### Templates
 
@@ -43,277 +70,87 @@ Source: https://github.com/openai/codex
 | [docs/templates/LLM-OPTIMIZATION-TEMPLATE.md](docs/templates/LLM-OPTIMIZATION-TEMPLATE.md) | Manual template for LLM-optimizing projects |
 | [docs/templates/llm-project-optimization/SKILL.md](docs/templates/llm-project-optimization/SKILL.md) | Installable agent skill |
 
-## Architecture Overview
-
-This repository documents the OpenAI Codex-RS TUI architecture - a production AI coding agent.
-
-### Layer Architecture
-
-```
-TUI Layer (codex-rs/tui/)
-  └── App, ChatWidget, ApprovalOverlay
-Core Layer (codex-rs/core/)
-  └── ThreadManager, CodexThread, Codex
-Protocol Layer (codex-rs/protocol/)
-  └── Op enum, EventMsg enum, Event struct
-App Server (codex-rs/app-server/)
-  └── MessageProcessor (JSON-RPC for external clients only)
-```
+## Key Best Practices (Summary)
 
-### Critical Architecture Fact
+### 1. Thin Orchestrator Pattern (Critical)
 
-TUI communicates directly with ThreadManager:
-  TUI App → ThreadManager → CodexThread → Codex
+Keep orchestrators thin (30-40% context), spawn subagents with fresh 200k context.
+Sources: Kata, Get-Shit-Done, Oh-My-OpenCode
 
-NOT through MessageProcessor:
-  WRONG: TUI App → MessageProcessor → ThreadManager
+### 2. Category-Based Delegation
 
-MessageProcessor is ONLY for external JSON-RPC clients (VS Code extension).
+Route by semantic category (visual-engineering, ultrabrain, quick), not model names.
+Source: Oh-My-OpenCode
 
-## Codex-RS Components
+### 3. Wave-Based Execution
 
-### TUI Layer (codex-rs/tui/)
+Execute independent tasks in parallel waves.
+Sources: Kata, Get-Shit-Done, Kimi K2
 
-| Component | File | Purpose |
-|-----------|------|---------|
-| App | app.rs | Main struct, event loop, holds ThreadManager |
-| ChatWidget | chatwidget.rs | Message display, event handlers |
-| ChatComposer | bottom_pane/chat_composer.rs | User input handling |
-| ApprovalOverlay | bottom_pane/approval_overlay.rs | Approval queue UI |
-| AppEvent | app_event.rs | Internal TUI events |
+### 4. Sequential Approval Processing
 
-### Core Layer (codex-rs/core/)
+Process approvals one at a time, never in parallel.
+Sources: Codex, Claude Code
 
-| Component | File | Purpose |
-|-----------|------|---------|
-| ThreadManager | thread_manager.rs | Thread lifecycle, spawn/stop |
-| CodexThread | codex_thread.rs | Agent wrapper with channels |
-| Codex | codex.rs | Agent implementation, LLM calls |
-| Session | session.rs | Session state management |
+### 5. Wisdom Accumulation
 
-### Protocol Layer (codex-rs/protocol/)
+Learn from successes, persist patterns across sessions.
+Source: Oh-My-OpenCode
 
-| Type | File | Purpose |
-|------|------|---------|
-| Op | protocol.rs | Operations: UserTurn, ExecApproval, Interrupt |
-| EventMsg | protocol.rs | Events: TurnStarted, TurnComplete, AgentMessage |
-| Event | protocol.rs | Wrapper: { id: String, msg: EventMsg } |
+### 6. PARL (Parallel-Agent RL)
 
-### App Server (codex-rs/app-server/)
+Trainable orchestrator + frozen subagents, optimize for Critical Steps.
+Source: Kimi K2
 
-| Component | File | Purpose |
-|-----------|------|---------|
-| MessageProcessor | message_processor.rs | JSON-RPC handling |
-| CodexMessageProcessor | codex_message_processor.rs | Codex-specific handlers |
+## Tool Comparison Quick Reference
 
-## Key Types
+### Multi-Agent Capabilities
 
-### Op Enum (Input to Agent)
+| Tool | Max Agents | Coordination |
+|------|------------|--------------|
+| Codex | 1 | N/A |
+| Claude Code | 1 + subagents | Task delegation |
+| OpenCode | 2 | Plan/Build tabs |
+| Oh-My-OpenCode | 15+ | Hive-mind |
+| Kata | ~10 | Phase orchestrator |
+| Kimi K2 | **100** | PARL |
 
-Operations submitted by user to agent:
-- UserTurn: Submit user message with items and cwd
-- ExecApproval: Approve/deny command execution
-- ApplyPatchApproval: Approve/deny file patch
-- Interrupt: Abort current task
-- Undo: Undo last action
-- RunUserShellCommand: Execute shell command (! prefix)
+### Provider Support
 
-Location: codex-rs/protocol/src/protocol.rs
+| Tool | Anthropic | OpenAI | Google | Local |
+|------|-----------|--------|--------|-------|
+| Codex | - | ✅ | - | - |
+| Claude Code | ✅ | - | - | - |
+| OpenCode | ✅ | ✅ | ✅ | ✅ |
+| Oh-My-OpenCode | ✅ | ✅ | ✅ | ✅ |
+| Kata | ✅ | - | - | - |
+| Kimi K2 | - | - | - | Moonshot |
 
-### EventMsg Enum (Output from Agent)
+## Unified Harness Architecture
 
-Events emitted by agent:
-- SessionConfigured: Session ready (first event)
-- TurnStarted: Agent began processing
-- TurnComplete: Agent finished processing
-- AgentMessage: Text response from agent
-- ExecCommandBegin: Command execution started
-- ExecCommandEnd: Command execution finished
-- ExecApprovalRequest: Needs approval for command
-- ApplyPatchApprovalRequest: Needs approval for patch
-- RequestUserInput: Requesting user input
-- Error: Error occurred
-- Warning: Non-fatal warning
+The harness provides:
+- Multi-provider support (Anthropic, OpenAI, Google, Local)
+- Multi-agent orchestration (hierarchical, mesh, swarm)
+- Generic event loop pattern
+- Extensible tool registry
+- Session persistence and forking
 
-Location: codex-rs/protocol/src/protocol.rs
+See: [docs/tools/UNIFIED-HARNESS.md](docs/tools/UNIFIED-HARNESS.md)
 
-### Event Struct
+## Message Types (Universal)
 
-Wrapper for all events:
-```
-struct Event {
-    id: String,    // Unique event ID
-    msg: EventMsg, // The actual event
-}
-```
+### Input (User → Agent)
+- user_message: Submit user message
+- tool_approval: Approve/deny tool execution
+- interrupt: Abort current task
+- config_update: Update settings
 
-## Communication Patterns
-
-### Direct Channel Communication
-
-TUI uses async channels directly:
-- submit(Op): Send operations to agent
-- recv(): Receive events from agent
-
-No intermediary service layer for TUI.
-
-### Event-Driven UI
-
-Main loop polls both terminal and agent events:
-1. Poll terminal events (keyboard, mouse)
-2. Poll agent events (non-blocking)
-3. Dispatch to appropriate handlers
-4. Render updated UI
-
-### Approval Queue
-
-Requests queued and processed one at a time:
-```
-struct ApprovalOverlay {
-    current: Option<ApprovalRequest>,
-    queue: Vec<ApprovalRequest>,
-}
-```
-
-Prevents UI overwhelm, ensures sequential decisions.
-
-## Safety Patterns
-
-### Explicit Approval Gates
-
-Commands requiring system access must be approved:
-1. Agent emits ExecApprovalRequest
-2. UI shows approval overlay
-3. User approves/denies
-4. ExecApproval sent back to agent
-5. Agent proceeds or aborts
-
-### Policy Amendments
-
-Users can update approval policies:
-- "Always approve" for specific patterns
-- "Always deny" for dangerous operations
-- Policies persist for session duration
-
-### Undo Capability
-
-Op::Undo allows reverting last action, providing safety net.
-
-## Implementation Patterns
-
-### Pattern 1: Typed Message Protocol
-
-All messages as Rust enums with exhaustive variants.
-Benefits: Compile-time checking, self-documenting API.
-See: docs/PATTERNS.md#pattern-1-typed-message-protocol
-
-### Pattern 2: Event-Driven UI Updates
-
-Poll events in main loop, dispatch to handlers.
-Benefits: Responsive UI, non-blocking processing.
-See: docs/PATTERNS.md#pattern-2-event-driven-ui-updates
-
-### Pattern 3: Approval Queue
-
-Queue requests, process one at a time.
-Benefits: Prevents overwhelm, sequential decisions.
-See: docs/PATTERNS.md#pattern-3-approval-queue
-
-### Pattern 4: Thread Wrapper
-
-Wrap agent in thread with channel-based interface.
-Benefits: Clean async API, isolation, testability.
-See: docs/PATTERNS.md#pattern-4-thread-wrapper
-
-### Pattern 5: Layer Separation
-
-Strict layer separation with clear dependencies.
-Benefits: Testable, replaceable UI, clear contracts.
-See: docs/PATTERNS.md#pattern-5-layer-separation
-
-### Pattern 6: External Client Adapter
-
-Separate adapter for external clients (JSON-RPC).
-Benefits: Simple TUI, appropriate protocols for each client.
-See: docs/PATTERNS.md#pattern-6-external-client-adapter
-
-## Core Concepts
-
-### Agent Communication
-
-Direct channel communication reduces latency, simplifies debugging.
-See: docs/CONCEPTS.md#1-direct-channel-communication
-
-### Operation/Event Model
-
-Request/response with typed enums: Op (input), EventMsg (output).
-See: docs/CONCEPTS.md#2-operationevent-model
-
-### Thread Management
-
-ThreadManager handles multiple concurrent agent threads.
-See: docs/CONCEPTS.md#thread-management
-
-### External Client Support
-
-JSON-RPC layer for VS Code, IDEs. TUI bypasses this entirely.
-See: docs/CONCEPTS.md#external-client-support
-
-## Glossary
-
-| Term | Definition |
-|------|------------|
-| Op | Operation enum - input to agent |
-| EventMsg | Event message enum - output from agent |
-| Event | Wrapper struct containing id and EventMsg |
-| ThreadManager | Manages agent thread lifecycle |
-| CodexThread | Wrapper around Codex agent with channels |
-| Codex | The actual agent implementation |
-| ApprovalOverlay | UI component for approval queue |
-| MessageProcessor | JSON-RPC handler for external clients |
-
-See: docs/GLOSSARY.md
-
-## Workflows
-
-### Add New Diagram
-
-1. Research Codex-RS source
-2. Create Mermaid diagram
-3. Add to architecture-diagram.md
-4. Validate with render-diagrams.sh
-5. Update indexes
-
-See: docs/WORKFLOWS.md#workflow-1-add-new-architecture-diagram
-
-### Update Documentation
-
-1. Read current content
-2. Check cross-references
-3. Make changes
-4. Update indexes
-5. Verify with glow
-
-See: docs/WORKFLOWS.md#workflow-2-update-existing-documentation
-
-### Add New Concept
-
-1. Choose correct file (CONCEPTS, PATTERNS, or GLOSSARY)
-2. Follow existing format
-3. Include source reference
-4. Update indexes
-
-See: docs/WORKFLOWS.md#workflow-3-add-new-concept-documentation
-
-### Verify Repository
-
-1. Validate Mermaid: ./scripts/render-diagrams.sh
-2. Check structure: ls -la docs/
-3. Check indexes: head -50 llms.txt
-4. Validate links
-5. Preview: glow docs/architecture-diagram.md
-
-See: docs/WORKFLOWS.md#workflow-4-verify-repository-integrity
+### Output (Agent → User)
+- turn_started/complete: Turn lifecycle
+- text_delta/complete: Streaming text
+- tool_call/result: Tool execution
+- approval_request: Needs user approval
+- error: Error occurred
 
 ## File Structure
 
@@ -327,65 +164,49 @@ ai-agent-study-guide/
 ├── README.md              # Overview
 ├── docs/
 │   ├── AGENTS.md          # Subdirectory context
-│   ├── architecture-diagram.md  # Mermaid diagrams
-│   ├── codex-architecture.html  # Generated HTML
-│   ├── CONCEPTS.md        # Core concepts
-│   ├── GLOSSARY.md        # Definitions
-│   ├── PATTERNS.md        # Patterns
-│   ├── WORKFLOWS.md       # Workflows
-│   ├── TOOLS-RESEARCH.md  # Tools research
-│   └── templates/
-│       ├── LLM-OPTIMIZATION-TEMPLATE.md
-│       └── llm-project-optimization/
-│           └── SKILL.md
+│   ├── architecture-diagram.md
+│   ├── CONCEPTS.md
+│   ├── GLOSSARY.md
+│   ├── PATTERNS.md
+│   ├── WORKFLOWS.md
+│   ├── TOOLS-RESEARCH.md
+│   ├── templates/
+│   │   ├── LLM-OPTIMIZATION-TEMPLATE.md
+│   │   └── llm-project-optimization/
+│   └── tools/             # NEW: Multi-tool documentation
+│       ├── README.md      # Landing page
+│       ├── BEST-PRACTICES.md
+│       ├── UNIFIED-HARNESS.md
+│       ├── codex/
+│       ├── claude-code/
+│       ├── opencode/
+│       ├── kata/
+│       ├── get-shit-done/
+│       ├── oh-my-opencode/
+│       └── kimi-k2/
+├── .opencode/agent/       # 15 agent guides
 └── scripts/
-    └── render-diagrams.sh # Mermaid validation
+    └── render-diagrams.sh
 ```
 
 ## Key Facts
 
-1. TUI uses ThreadManager directly (not MessageProcessor)
-2. MessageProcessor is only for external JSON-RPC clients
-3. Op enum = input to agent (UserTurn, ExecApproval, Interrupt)
-4. EventMsg enum = output from agent (TurnStarted, TurnComplete, AgentMessage)
-5. Approval requests are queued and processed sequentially
-6. This is a documentation-only repository (no implementation code)
+1. This repository documents 7 AI coding agent implementations
+2. Best practices synthesized from all tools in BEST-PRACTICES.md
+3. Multi-provider harness architecture in UNIFIED-HARNESS.md
+4. Each tool has consistent README with diagrams
+5. Documentation-only repository (no implementation code)
 
 ## Verification Commands
 
 | Command | Purpose |
 |---------|---------|
 | ./scripts/render-diagrams.sh | Validate Mermaid diagrams |
-| glow docs/[file].md | Terminal markdown preview |
-| open docs/codex-architecture.html | View rendered diagrams |
-
-## Templates & Tools
-
-### Automation Tools
-
-| Tool | Purpose |
-|------|---------|
-| npx agent-browser | Browser automation CLI (11.8k stars) |
-| npx skills | Agent Skills installer (3.7k stars) |
-| npx opensrc | Fetch library source (328 stars) |
-| agentskills.io | SKILL.md specification |
-| skills.sh | Skill discovery directory |
-
-### LLM Optimization Templates
-
-For LLM-optimizing other projects:
-- Manual: docs/templates/LLM-OPTIMIZATION-TEMPLATE.md
-- Skill: docs/templates/llm-project-optimization/SKILL.md
-
-## Source
-
-Primary: https://github.com/openai/codex
-Protocol: https://github.com/openai/codex/blob/main/codex-rs/protocol/src/protocol.rs
-TUI: https://github.com/openai/codex/tree/main/codex-rs/tui
-Core: https://github.com/openai/codex/tree/main/codex-rs/core
+| glow docs/tools/BEST-PRACTICES.md | Preview best practices |
+| ls docs/tools/*/README.md | List all tool READMEs |
 
 ## Related Resources
 
 - Mermaid Documentation: https://mermaid.js.org/
 - llms.txt Standard: https://llmstxt.org/
-- glow CLI: https://github.com/charmbracelet/glow
+- Agent Skills Spec: https://agentskills.io
